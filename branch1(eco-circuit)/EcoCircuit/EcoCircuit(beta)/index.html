@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoCircuit | National U Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="auth-modal-overlay">
+        <div class="auth-modal-content">
+            <div class="auth-logo">Eco <span>Circuit</span></div>
+            <h2>Welcome, Bulldog! 🎓</h2>
+            <p class="auth-subtitle">Let's get to know you before we start</p>
+            
+            <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                    <label for="studentId">Student ID *</label>
+                    <input type="text" id="studentId" placeholder="e.g., 20251001234" inputmode="numeric" pattern="\d+" title="Numbers only" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentName">Full Name *</label>
+                    <input type="text" id="studentName" placeholder="e.g., Ash Ketchum" pattern="[A-Za-z. ]+" title="Letters, spaces and periods only" required>
+                </div>
+                <button type="submit" class="btn-primary auth-btn">Continue</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- DEVICE SELECTION MODAL -->
+    <div id="deviceModal" class="auth-modal-overlay">
+        <div class="auth-modal-content">
+            <h2 id="deviceGreeting">What device are we evaluating today?</h2>
+            <p class="auth-subtitle">Choose your device type to get tailored recommendations</p>
+            
+            <div class="device-selector">
+                <div class="device-option" data-device="cellphone">
+                    <div class="device-icon">📱</div>
+                    <span>Cellphone</span>
+                </div>
+                <div class="device-option" data-device="laptop">
+                    <div class="device-icon">💻</div>
+                    <span>Laptop</span>
+                </div>
+                <div class="device-option" data-device="tablet">
+                    <div class="device-icon">📲</div>
+                    <span>Tablet</span>
+                </div>
+            </div>
+            <button id="skipDeviceBtn" class="btn-secondary auth-btn">Skip for Now</button>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="logo">Eco <span>Circuit</span></div>
+        <ul class="nav-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#framework">Modules</a></li>
+            <li><a href="#directory-section">Locations</a></li>
+            <li class="user-info" id="userInfo"></li>
+            <li><button class="btn-logout" id="logoutBtn">Logout</button></li>
+        </ul>
+    </nav>
+
+    <header id="hero" class="hero-section">
+        <div class="hero-content">
+            <h1 id="heroGreeting">Sustain Your Tech. <br><span class="highlight-gold">Save Your Wallet.</span></h1>
+            <p class="hero-subtext">The Bulldog's guide to sustainable tech habits. Repair, Maintain, or Recycle responsibly.</p>
+            <p id="sessionMeta" class="session-meta hidden"></p>
+            <a href="#framework" class="btn btn-primary hero__cta">Start Modules</a>
+            
+            <div id="deviceInfo" class="device-info-badge hidden hero__device-info">
+                <span id="selectedDeviceDisplay"></span>
+                <button class="btn btn-change-device" id="changeDeviceBtn">Change Device</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="framework" class="framework-section">
+            <div class="section-header">
+                <h2>The EcoCircuit Framework</h2>
+                <p class="section-header__subtitle">Interactive Tools for Bulldogs</p>
+            </div>
+
+            <div class="grid-container">
+                <!-- MODULE 1: TIPID -->
+                <article class="card pillar-tipid">
+                    <div class="badge">Repair Analysis</div>
+                    <div class="icon-container">🔧</div>
+                    <h3>01. TIPID</h3>
+                    <p>Advanced Cost-Benefit Analysis.</p>
+                    <div class="mini-tool scrollable-form">
+                        <label id="repairCostLabel">Repair Cost (₱):</label>
+                        <input type="number" id="repairPrice" placeholder="e.g. 2000">
+
+                        <label id="newCostLabel">New Device Cost (₱):</label>
+                        <input type="number" id="newPhonePrice" placeholder="e.g. 15000">
+
+                        <label>Parts Availability:</label>
+                        <select id="partsAvail">
+                            <option value="readily_available">Readily Available</option>
+                            <option value="scarce">Scarce/Waitlisted</option>
+                            <option value="obsolete">Obsolete</option>
+                        </select>
+
+                        <label>Physical Damage:</label>
+                        <select id="physDamage">
+                            <option value="minor">Minor (Scratches)</option>
+                            <option value="moderate">Moderate (Cracks)</option>
+                            <option value="severe">Severe (Bent frame, crushed)</option>
+                        </select>
+
+                        <button class="btn-action" id="btn-calc-tipid">Analyze Value</button>
+                        <div id="tipid-result" class="result-box hidden"></div>
+                    </div>
+                </article>
+
+                <!-- MODULE 2: TECH-CARE -->
+                <article class="card pillar-care">
+                    <div class="badge">Maintenance</div>
+                    <div class="icon-container">📱</div>
+                    <h3>02. TECH-CARE</h3>
+                    <p>Guided Maintenance Protocol.</p>
+                    <div class="mini-tool">
+                        <div class="code-snippet code-snippet--vertical" id="tech-care-ui">
+                            <h4 id="tc-stage-title" class="code-snippet__title">Stage 1: Battery Health</h4>
+                            <p id="tc-prompt" class="code-snippet__prompt">Does your phone die before reaching 1%?</p>
+                        </div>
+                        <div class="tip-buttons-group" id="tc-controls">
+                            <button class="btn-small" id="btn-tc-yes">Yes</button>
+                            <button class="btn-small" id="btn-tc-no">No</button>
+                            <button class="btn-small hidden" id="btn-tc-reset">Reset Assessment</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- MODULE 3: TRANSFER -->
+                <article class="card pillar-transfer">
+                    <div class="badge">Disposal Logic</div>
+                    <div class="icon-container">♻️</div>
+                    <h3>03. TRANSFER</h3>
+                    <p>Eco-Decision Tree.</p>
+                    <div class="mini-tool scrollable-form">
+                        <label id="transfer-q1">1. Power: Does it turn on?</label>
+                        <select id="t-power"><option value="yes">Yes</option><option value="no">No</option></select>
+
+                        <label id="transfer-q2">2. Safety: Is the battery swelling?</label>
+                        <select id="t-battery"><option value="no">No</option><option value="yes">Yes (Dangerous)</option></select>
+
+                        <label id="transfer-q3">3. Hardware: Is the screen/touch functional?</label>
+                        <select id="t-screen"><option value="yes">Yes</option><option value="no">No</option></select>
+
+                        <label id="transfer-q4">4. Environment: Is there water damage?</label>
+                        <select id="t-water"><option value="no">No</option><option value="yes">Yes</option></select>
+
+                        <button class="btn-action" id="btn-decide-transfer">Get Recommendation</button>
+                        <div id="transfer-result" class="result-box hidden"></div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- LOCATION DIRECTORY -->
+        <section id="directory-section" class="directory-wrapper">
+            <div class="section-header">
+                <h2>Location Directory</h2>
+                <p class="section-header__subtitle">Repair Hubs & E-Waste Bins</p>
+            </div>
+            
+            <div class="location-grid">
+                <div class="loc-box repair-box" data-location="dan">
+                    <h4>Dan The Technician Repair</h4>
+                    <span class="loc-tag">Repair Hub</span>
+                </div>
+                <div class="loc-box repair-box" data-location="tovy">
+                    <h4>Tovy's Cellphone Repair</h4>
+                    <span class="loc-tag">Repair Hub</span>
+                </div>
+                <div class="loc-box repair-box" data-location="orbanthic">
+                    <h4>Orbanthics Repair Shop</h4>
+                    <span class="loc-tag">Repair Hub</span>
+                </div>
+                <div class="loc-box waste-box" data-location="annex">
+                    <h4>NU Annex 2 (1st Floor)</h4>
+                    <span class="loc-tag">E-Waste Bin</span>
+                </div>
+                <div class="loc-box waste-box" data-location="jmb">
+                    <h4>NU JMB (1st Floor)</h4>
+                    <span class="loc-tag">E-Waste Bin</span>
+                </div>
+                <div class="loc-box waste-box" data-location="mb">
+                    <h4>NU MB (5th Floor)</h4>
+                    <span class="loc-tag">E-Waste Bin</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL -->
+    <div id="locModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal" id="closeLocModalBtn">&times;</span>
+            <h3 id="modalTitle">Location Name</h3>
+            <img id="modalImg" class="modal-img" src="" alt="Location Image">
+            <p id="modalAddress" class="modal-address">Address here...</p>
+            <div class="modal-directions">
+                <strong>Directions:</strong>
+                <p id="modalDirection">Instructions...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 EcoCircuit. SDG-12</p>
+    </footer>
+
+    <script type="module" src="src/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+/* Buttons and component modules */
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-action,
+.auth-btn,
+.btn-change-device,
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    text-decoration: none;
+}
+
+.btn {
+    text-align: center;
+}
+
+.btn-primary {
+    background: var(--nu-gold);
+    color: var(--nu-blue);
+    border-radius: 50px;
+    font-weight: 800;
+}
+
+.btn-secondary {
+    background: var(--bg-surface);
+    color: var(--nu-blue);
+    border: 2px solid var(--nu-blue);
+}
+
+.btn-secondary:hover {
+    background: var(--nu-blue);
+    color: var(--bg-surface);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+}
+
+.btn-action {
+    width: 100%;
+    margin-top: 15px;
+    background: var(--nu-blue);
+    color: var(--bg-surface);
+}
+
+.btn-action:hover {
+    background: var(--nu-gold);
+    color: var(--nu-blue);
+}
+
+.btn-logout {
+    background: var(--danger-red);
+    color: var(--bg-surface);
+    padding: 8px 15px;
+    font-size: 0.8rem;
+}
+
+.btn-logout:hover {
+    background: var(--danger-red-hover);
+}
+
+.btn-change-device {
+    background: var(--nu-gold);
+    color: var(--nu-blue);
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.btn-change-device:hover {
+    background: var(--nu-blue);
+    color: var(--nu-gold);
+    transform: scale(1.05);
+}
+
+.tip-buttons-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-small {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--nu-blue);
+    background: var(--bg-surface);
+    color: var(--nu-blue);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-small:hover {
+    background: var(--nu-blue);
+    color: var(--bg-surface);
+}
+
+.auth-form,
+.mini-tool {
+    text-align: left;
+}
+
+.form-group,
+.mini-tool label {
+    margin-bottom: 1rem;
+    display: block;
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.mini-tool input,
+.mini-tool select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.mini-tool input,
+.mini-tool select {
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.form-group input:focus,
+.mini-tool input:focus,
+.mini-tool select:focus {
+    outline: none;
+    border-color: var(--nu-blue);
+    box-shadow: 0 0 0 3px rgba(53, 64, 142, 0.1);
+}
+
+.device-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.device-option {
+    padding: 2rem 1rem;
+    border: 3px solid var(--border-light);
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: var(--bg-surface);
+}
+
+.device-option:hover {
+    border-color: var(--nu-gold);
+    background: #fffbf0;
+    transform: translateY(-5px);
+}
+
+.device-option.selected {
+    border-color: var(--nu-blue);
+    background: rgba(53, 64, 142, 0.05);
+}
+
+.device-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.device-option span {
+    font-weight: 600;
+    color: var(--text-main);
+    display: block;
+    font-size: 0.9rem;
+}
+
+.code-snippet {
+    background: var(--bg-body);
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #333;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.code-snippet--vertical {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 140px;
+}
+
+.code-snippet__title {
+    margin-bottom: 10px;
+    color: var(--nu-blue);
+    width: 100%;
+}
+
+.code-snippet__prompt {
+    font-weight: 500;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.result-box {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f0f2f5;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-left: 4px solid var(--nu-gold);
+}
