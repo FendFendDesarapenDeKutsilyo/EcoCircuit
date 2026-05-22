@@ -1,0 +1,43 @@
+/* Variables and base utilities */
+:root {
+    --nu-blue: #35408e;
+    --nu-gold: #ffd400;
+    --nu-dark-blue: #242b5e;
+    --danger-red: #e74c3c;
+    --danger-red-hover: #c0392b;
+    --success-green: #2ecc71;
+    --warning-yellow: #f1c40f;
+    --bg-body: #f4f6f9;
+    --bg-surface: #ffffff;
+    --text-main: #242b5e;
+    --text-muted: #666666;
+    --border-light: #e0e0e0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    font-family: 'Poppins', sans-serif;
+    scroll-behavior: smooth;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+button,
+a {
+    font-family: 'Poppins', sans-serif;
+}
