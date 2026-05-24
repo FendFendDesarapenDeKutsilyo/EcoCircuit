@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoCircuit | National U Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+    <title>EcoCircuit Collective | National U Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,15 +15,14 @@
             <div class="auth-logo">Eco <span>Circuit</span></div>
             <h2>Welcome, Bulldog! 🎓</h2>
             <p class="auth-subtitle">Let's get to know you before we start</p>
-            
             <form id="loginForm" class="auth-form">
-                    <div class="form-group">
+                <div class="form-group">
                     <label for="studentId">Student ID *</label>
-                    <input type="text" id="studentId" placeholder="e.g., 20251001234" inputmode="numeric" pattern="\d+" title="Numbers only" required>
+                    <input type="text" id="studentId" placeholder="e.g., 2025-100XXXX" required>
                 </div>
                 <div class="form-group">
                     <label for="studentName">Full Name *</label>
-                    <input type="text" id="studentName" placeholder="e.g., Ash Ketchum" pattern="[A-Za-z. ]+" title="Letters, spaces and periods only" required>
+                    <input type="text" id="studentName" placeholder="e.g., Ash Ketchum" required>
                 </div>
                 <button type="submit" class="btn-primary auth-btn">Continue</button>
             </form>
@@ -35,7 +34,6 @@
         <div class="auth-modal-content">
             <h2 id="deviceGreeting">What device are we evaluating today?</h2>
             <p class="auth-subtitle">Choose your device type to get tailored recommendations</p>
-            
             <div class="device-selector">
                 <div class="device-option" data-device="cellphone">
                     <div class="device-icon">📱</div>
@@ -54,66 +52,88 @@
         </div>
     </div>
 
+    <!-- NAVBAR -->
     <nav class="navbar">
-        <div class="logo">Eco <span>Circuit</span></div>
-        <ul class="nav-links">
-            <li><a href="#hero">Home</a></li>
-            <li><a href="#framework">Modules</a></li>
-            <li><a href="#directory-section">Locations</a></li>
-            <li class="user-info" id="userInfo"></li>
-            <li><button class="btn-logout" id="logoutBtn">Logout</button></li>
-        </ul>
+        <div class="navbar-brand">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                ECOCIRCUIT <span class="logo-accent">COLLECTIVE</span>
+            </div>
+        </div>
+        <div class="navbar-nav">
+            <ul class="nav-links">
+                <li><a href="#hero" class="nav-pill">Home</a></li>
+                <li><a href="#framework" class="nav-pill">Modules</a></li>
+                <li><a href="#stats" class="nav-pill">About</a></li>
+                <li><a href="#directory-section" class="nav-pill">Locations</a></li>
+                <li class="nav-pill-user" id="userInfo" style="display: none;"></li>
+                <li><button class="nav-pill nav-pill-logout btn-logout" id="logoutBtn">Logout</button></li>
+            </ul>
+        </div>
     </nav>
 
+    <!-- HERO SECTION -->
     <header id="hero" class="hero-section">
-        <div class="hero-content">
-            <h1 id="heroGreeting">Sustain Your Tech. <br><span class="highlight-gold">Save Your Wallet.</span></h1>
-            <p class="hero-subtext">The Bulldog's guide to sustainable tech habits. Repair, Maintain, or Recycle responsibly.</p>
-            <p id="sessionMeta" class="session-meta hidden"></p>
-            <a href="#framework" class="btn btn-primary hero__cta">Start Modules</a>
-            
-            <div id="deviceInfo" class="device-info-badge hidden hero__device-info">
-                <span id="selectedDeviceDisplay"></span>
-                <button class="btn btn-change-device" id="changeDeviceBtn">Change Device</button>
+        <div class="hero-grid">
+            <div class="hero-left">
+                <h1 id="heroGreeting">
+                    SUSTAINABLE E-WASTE<br>
+                    MANAGEMENT MADE<br>
+                    <span class="hero-accent">SIMPLE</span>
+                </h1>
+                <p class="hero-subtext">The Bulldog's guide to sustainable tech habits.<br>Repair, Maintain, or Recycle responsibly.</p>
+                <a href="#framework" class="btn-start-modules">START MODULES ↓</a>
+            </div>
+            <div class="hero-right">
+                <div class="hero-info-card">
+                    <p>EcoCircuit Collective promotes responsible consumption and proper management of e-waste.</p>
+                </div>
+                <div class="hero-info-card">
+                    <p>UN SDG 12: Responsible Consumption and Production.</p>
+                </div>
+                <div id="deviceInfo" class="device-info-badge hidden">
+                    <span id="selectedDeviceDisplay"></span>
+                    <button class="btn-change-device" id="changeDeviceBtn">Change Device</button>
+                </div>
             </div>
         </div>
     </header>
 
     <main>
+        <!-- MODULES SECTION -->
         <section id="framework" class="framework-section">
             <div class="section-header">
-                <h2>The EcoCircuit Framework</h2>
-                <p class="section-header__subtitle">Interactive Tools for Bulldogs</p>
+                <h2 class="section-title">THE ECOCIRCUIT COLLECTIVE</h2>
             </div>
 
             <div class="grid-container">
                 <!-- MODULE 1: TIPID -->
                 <article class="card pillar-tipid">
-                    <div class="badge">Repair Analysis</div>
-                    <div class="icon-container">🔧</div>
-                    <h3>01. TIPID</h3>
-                    <p>Advanced Cost-Benefit Analysis.</p>
+                    <div class="card-image-area tipid-img">
+                        <span class="card-img-icon">💸</span>
+                    </div>
+                    <h3 class="module-title">TIPID</h3>
+                    <div class="module-desc-bar">
+                        <span>Save money and reduce unnecessary e-waste.</span>
+                        <span class="arrow-btn">→</span>
+                    </div>
                     <div class="mini-tool scrollable-form">
                         <label id="repairCostLabel">Repair Cost (₱):</label>
                         <input type="number" id="repairPrice" placeholder="e.g. 2000">
-
                         <label id="newCostLabel">New Device Cost (₱):</label>
                         <input type="number" id="newPhonePrice" placeholder="e.g. 15000">
-
                         <label>Parts Availability:</label>
                         <select id="partsAvail">
                             <option value="readily_available">Readily Available</option>
                             <option value="scarce">Scarce/Waitlisted</option>
                             <option value="obsolete">Obsolete</option>
                         </select>
-
                         <label>Physical Damage:</label>
                         <select id="physDamage">
                             <option value="minor">Minor (Scratches)</option>
                             <option value="moderate">Moderate (Cracks)</option>
                             <option value="severe">Severe (Bent frame, crushed)</option>
                         </select>
-
                         <button class="btn-action" id="btn-calc-tipid">Analyze Value</button>
                         <div id="tipid-result" class="result-box hidden"></div>
                     </div>
@@ -121,14 +141,18 @@
 
                 <!-- MODULE 2: TECH-CARE -->
                 <article class="card pillar-care">
-                    <div class="badge">Maintenance</div>
-                    <div class="icon-container">📱</div>
-                    <h3>02. TECH-CARE</h3>
-                    <p>Guided Maintenance Protocol.</p>
+                    <div class="card-image-area techcare-img">
+                        <span class="card-img-icon">🔧</span>
+                    </div>
+                    <h3 class="module-title">TECH-CARE</h3>
+                    <div class="module-desc-bar">
+                        <span>Maintain and repair devices responsibly.</span>
+                        <span class="arrow-btn">→</span>
+                    </div>
                     <div class="mini-tool">
-                        <div class="code-snippet code-snippet--vertical" id="tech-care-ui">
-                            <h4 id="tc-stage-title" class="code-snippet__title">Stage 1: Battery Health</h4>
-                            <p id="tc-prompt" class="code-snippet__prompt">Does your phone die before reaching 1%?</p>
+                        <div class="code-snippet" id="tech-care-ui" style="flex-direction: column; align-items: flex-start;">
+                            <h4 id="tc-stage-title" style="margin-bottom: 10px; color: var(--nu-gold); width: 100%;">Stage 1: Battery Health</h4>
+                            <p id="tc-prompt" style="font-weight: 500; font-size: 0.85rem; color: #cdd5e0;">Does your phone die before reaching 1%?</p>
                         </div>
                         <div class="tip-buttons-group" id="tc-controls">
                             <button class="btn-small" id="btn-tc-yes">Yes</button>
@@ -140,23 +164,23 @@
 
                 <!-- MODULE 3: TRANSFER -->
                 <article class="card pillar-transfer">
-                    <div class="badge">Disposal Logic</div>
-                    <div class="icon-container">♻️</div>
-                    <h3>03. TRANSFER</h3>
-                    <p>Eco-Decision Tree.</p>
+                    <div class="card-image-area transfer-img">
+                        <span class="card-img-icon">♻️</span>
+                    </div>
+                    <h3 class="module-title">TRANSFER</h3>
+                    <div class="module-desc-bar">
+                        <span>Responsible disposal and recycling solutions.</span>
+                        <span class="arrow-btn">→</span>
+                    </div>
                     <div class="mini-tool scrollable-form">
                         <label id="transfer-q1">1. Power: Does it turn on?</label>
                         <select id="t-power"><option value="yes">Yes</option><option value="no">No</option></select>
-
                         <label id="transfer-q2">2. Safety: Is the battery swelling?</label>
                         <select id="t-battery"><option value="no">No</option><option value="yes">Yes (Dangerous)</option></select>
-
                         <label id="transfer-q3">3. Hardware: Is the screen/touch functional?</label>
                         <select id="t-screen"><option value="yes">Yes</option><option value="no">No</option></select>
-
                         <label id="transfer-q4">4. Environment: Is there water damage?</label>
                         <select id="t-water"><option value="no">No</option><option value="yes">Yes</option></select>
-
                         <button class="btn-action" id="btn-decide-transfer">Get Recommendation</button>
                         <div id="transfer-result" class="result-box hidden"></div>
                     </div>
@@ -164,13 +188,47 @@
             </div>
         </section>
 
+        <!-- STATS SECTION -->
+        <section id="stats" class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-blue">🖥️</div>
+                    <div class="stat-content">
+                        <div class="stat-value">62M <span class="stat-unit">Tons</span></div>
+                        <p class="stat-desc">E-waste was generated globally in 2022. This is expected to increase to 82M tons by 2030.</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-gold">💎</div>
+                    <div class="stat-content">
+                        <div class="stat-value">$91B <span class="stat-unit">Valuable Materials</span></div>
+                        <p class="stat-desc">Valuable materials like gold, copper, and iron worth USD 91 billion are lost yearly due to improper disposal.</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-green">♻️</div>
+                    <div class="stat-content">
+                        <div class="stat-value">22.3% <span class="stat-unit">Recycled</span></div>
+                        <p class="stat-desc">Only 22.3% of global e-waste was properly collected and recycled.</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-dark">⚠️</div>
+                    <div class="stat-content">
+                        <div class="stat-value">85% <span class="stat-unit">Improperly Disposed</span></div>
+                        <p class="stat-desc">Most e-waste ends up in landfills or incinerators, contributing to toxic pollution and hazardous waste.</p>
+                    </div>
+                </div>
+            </div>
+            <p class="stats-citation">World Health Organization, &amp; International Telecommunication Union. (2024). <em>The Global E-waste Monitor 2024.</em> <a href="https://www.itu.int/en/ITU-D/Environment/Pages/Spotlight/Global-Ewaste-Monitor-2024.aspx" target="_blank">ITU Official Report Page ↗</a></p>
+        </section>
+
         <!-- LOCATION DIRECTORY -->
         <section id="directory-section" class="directory-wrapper">
             <div class="section-header">
-                <h2>Location Directory</h2>
-                <p class="section-header__subtitle">Repair Hubs & E-Waste Bins</p>
+                <h2 class="directory-title">Location Directory</h2>
+                <p class="directory-sub">Repair Hubs &amp; E-Waste Bins</p>
             </div>
-            
             <div class="location-grid">
                 <div class="loc-box repair-box" data-location="dan">
                     <h4>Dan The Technician Repair</h4>
@@ -200,7 +258,7 @@
         </section>
     </main>
 
-    <!-- MODAL -->
+    <!-- LOCATION MODAL -->
     <div id="locModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-modal" id="closeLocModalBtn">&times;</span>
@@ -215,9 +273,9 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 EcoCircuit. SDG-12</p>
+        <p>&copy; 2026 EcoCircuit Collective &nbsp;|&nbsp; SDG-12: Responsible Consumption &amp; Production</p>
     </footer>
 
-    <script type="module" src="src/js/main.js"></script>
+    <script src="Main.js"></script>
 </body>
 </html>
