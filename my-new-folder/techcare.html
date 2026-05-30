@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech-Care Diagnostics — EcoCircuit Collective</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nuBlue: '#35408e',
+                        nuGold: '#ffd400',
+                        nuDark: '#242b5e'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f3d9e 0%, #1565c0 40%, #2196f3 80%, #42a5f5 100%);
+        }
+        .module-header-badge {
+            display: inline-block;
+            background: rgba(0,185,212,0.15);
+            color: #00bcd4;
+            border: 1px solid rgba(0,185,212,0.25);
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- NAVBAR INJECTION BOUNDARY -->
+    <div id="navbar-container"></div>
+
+    <!-- MAIN MODULE CONTENT -->
+    <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-8">
+        <!-- HEADER -->
+        <header class="mb-8">
+            <span class="module-header-badge">
+                MODULE 02 — RIGOROUS REPAIR & DIALOGUE
+            </span>
+            <h1 class="text-white text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">
+                🔧 TECH-CARE HARDWARE DIAGNOSTICS
+            </h1>
+            <p class="text-blue-100 text-sm max-w-2xl">
+                Evaluating <span id="currentProfileTitle" class="text-[#00bcd4] font-extrabold font-mono">None</span> target profile system health. Proceed past our 3 diagnostic stages to unlock precise physical maintenance protocols.
+            </p>
+        </header>
+
+        <!-- DYNAMIC QUIZ WORKSPACE -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mb-12">
+            
+            <!-- FORM/QUIZ ENGINES CARD -->
+            <section class="card p-6 min-h-[360px] flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-white font-bold text-lg flex items-center gap-2">
+                            <span class="text-[#00bcd4]">🧠</span> Diagnostic Wizard
+                        </h2>
+                        <span id="quizProgressBar" class="text-[10px] font-bold bg-[rgba(255,255,255,0.1)] px-2 py-1 rounded text-white">Stage 1/3</span>
+                    </div>
+
+                    <!-- QUIZ ITEM INTERACTIVE WRAPPER -->
+                    <div id="quizQuestionPanel" class="animate-fadeIn py-6">
+                        <h3 id="tc-stage-title" class="text-[#00bcd4] text-xs font-black uppercase tracking-widest mb-1.5">Stage 1: Battery health</h3>
+                        <p id="tc-prompt" class="text-white text-base font-bold leading-snug mb-6">
+                            Does your system suffer random reboot shutdowns or die over 10%?
+                        </p>
+
+                        <div class="flex gap-4">
+                            <button id="btn-tc-yes" onclick="handleResponseClick(true)" class="flex-1 bg-[rgba(0,185,212,0.15)] border border-[rgba(0,185,212,0.4)] hover:bg-[rgba(0,185,212,0.25)] text-[#00bcd4] hover:text-white font-bold py-3 px-4 rounded-xl transition-all cursor-pointer select-none">
+                                Yes, that occurs
+                            </button>
+                            <button id="btn-tc-no" onclick="handleResponseClick(false)" class="flex-1 bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.15)] text-white font-bold py-3 px-4 rounded-xl transition-all cursor-pointer select-none">
+                                No, stable
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- COMPLETE SCREEN -->
+                    <div id="quizCompletePanel" class="hidden animate-fadeIn py-6 text-center">
+                        <div class="text-5xl mb-3">📋</div>
+                        <h3 class="text-white font-extrabold text-xl mb-1">Evaluation Completed!</h3>
+                        <p class="text-xs text-blue-200 mb-6">Your customized maintenance protocols have been generated successfully.</p>
+                        <button id="btn-tc-reset" onclick="resetDiagnostics()" class="btn-secondary text-xs px-4 py-2 select-none cursor-pointer">
+                            Rerun Diagnostic Stages &rarr;
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BOTTOM HELP ACCENTS -->
+                <p class="text-[10px] text-blue-200 italic">Caution: If any Lithium parts are physically swollen, avoid diagnostic tests and proceed to e-waste recycling bins directly.</p>
+            </section>
+
+            <!-- RECOMMENDATIONS LOG STREAM -->
+            <section class="card p-6 min-h-[360px] flex flex-col justify-between">
+                <div>
+                    <h2 class="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                        <span class="text-[#ffd400]">📖</span> Generation Protocols Log
+                    </h2>
+
+                    <!-- RESULTS PLACEHOLDER -->
+                    <div id="protocolPlaceholder" class="text-center py-16 text-gray-400">
+                        <div class="text-4xl mb-3">⚙️</div>
+                        <p class="text-sm font-semibold text-white">Awaiting Diagnostic Input</p>
+                        <p class="text-[11px] text-gray-400 mt-1">Logs populate dynamically as questions are answered.</p>
+                    </div>
+
+                    <!-- PROTOCOLS LOG STREAM -->
+                    <div id="protocolsLogContainer" class="hidden space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                        <!-- Dynamic items loaded here -->
+                    </div>
+                </div>
+
+                <!-- SAVE STATE INDICATOR -->
+                <div id="techcareSaveBadge" class="hidden text-center text-xs font-semibold text-[#00bcd4] py-2 border-t border-[rgba(255,255,255,0.08)] mt-4">
+                    ⚡ Protocols preserved. Rerun diagnostics if device conditions change.
+                </div>
+            </section>
+
+        </div>
+
+        <!-- EXTENDED STEP-BY-STEP DIAGRAMS -->
+        <section class="mb-12">
+            <h2 class="text-white font-extrabold text-xl mb-4 uppercase tracking-wide">
+                Campus DIY Service Manuals
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-[var(--card-navy)] border border-[rgba(255,255,255,0.08)] rounded-2xl p-5 hover:border-[#00bcd4]/40 transition-colors">
+                    <h3 class="text-[#00bcd4] font-bold text-sm mb-2 uppercase tracking-wide">📐 Screen Alignment</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed mb-3">If visual screens experience flickering lines or ghost touches, do not immediately buy modules. Clear connection cables of dust indices:</p>
+                    <ol class="text-[11px] list-decimal list-inside text-gray-400 space-y-1">
+                        <li>Dismount surrounding rubber bezels.</li>
+                        <li>Expose primary ribbon connectors.</li>
+                        <li>Saponify connector pads with isopropylic elements gently.</li>
+                    </ol>
+                </div>
+                <div class="bg-[var(--card-navy)] border border-[rgba(255,255,255,0.08)] rounded-2xl p-5 hover:border-[#00bcd4]/40 transition-colors">
+                    <h3 class="text-[#00bcd4] font-bold text-sm mb-2 uppercase tracking-wide">🔋 Battery Calibrations</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed mb-3">Reset current meter capacities metrics triggers to avoid abrupt battery shutdowns:</p>
+                    <ol class="text-[11px] list-decimal list-inside text-gray-400 space-y-1">
+                        <li>Drain systems purely to zero percent capacity.</li>
+                        <li>Power on repeatedly until screens trigger immediate failures.</li>
+                        <li>Charge continuously to 100% in powered-down states.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="max-w-7xl mx-auto text-center px-4">
+            <p class="text-xs mb-1 font-bold tracking-wide uppercase text-gray-500">EcoCircuit Collective &bull; National University Manila Campus</p>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="./main.js"></script>
+    <script>
+        let currentStageIndex = 0;
+        let activeQuestions = [];
+        let collectedResponses = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check auth
+            if (!enforceAuthentication()) {
+                injectLoginModal();
+                return;
+            }
+
+            // Injects navbar
+            injectNavbar('techcare');
+
+            // Load device context
+            const session = getSession();
+            if (session) {
+                const dev = session.selectedDevice || 'cellphone';
+                let label = 'Cellphone';
+                if (dev === 'laptop') label = 'Laptop';
+                if (dev === 'tablet') label = 'Tablet';
+                
+                document.getElementById('currentProfileTitle').innerText = label.toUpperCase();
+
+                // Select questions matching device profile
+                activeQuestions = TECHCARE_QUESTIONS[dev] || TECHCARE_QUESTIONS['cellphone'];
+
+                // Restore previous results history if exists
+                const savedHistory = getSavedResults();
+                if (savedHistory && savedHistory.techcare) {
+                    collectedResponses = savedHistory.techcare.responses || [];
+                    currentStageIndex = activeQuestions.length; // Complete state
+                    loadCompleteLayout();
+                } else {
+                    renderQuestionStage();
+                }
+            }
+        });
+
+        function renderQuestionStage() {
+            if (currentStageIndex >= activeQuestions.length) {
+                loadCompleteLayout();
+                return;
+            }
+
+            const q = activeQuestions[currentStageIndex];
+
+            document.getElementById('quizQuestionPanel').classList.remove('hidden');
+            document.getElementById('quizCompletePanel').classList.add('hidden');
+            document.getElementById('quizProgressBar').innerText = `Stage ${currentStageIndex + 1}/${activeQuestions.length}`;
+            
+            document.getElementById('tc-stage-title').innerText = q.title;
+            document.getElementById('tc-prompt').innerText = q.prompt;
+        }
+
+        function handleResponseClick(isYes) {
+            const q = activeQuestions[currentStageIndex];
+            const answerText = isYes ? q.yesResponse : q.noResponse;
+
+            collectedResponses.push({
+                stage: q.title,
+                issue: q.issueTag,
+                answer: isYes ? 'Yes' : 'No',
+                protocol: answerText
+            });
+
+            // Update result diagnostics viewport list
+            document.getElementById('protocolPlaceholder').classList.add('hidden');
+            const logContainer = document.getElementById('protocolsLogContainer');
+            logContainer.classList.remove('hidden');
+
+            const logItem = document.createElement('div');
+            logItem.className = 'p-3 bg-[rgba(255,255,255,0.08)] rounded-xl border border-[rgba(255,255,255,0.08)] animate-fadeIn text-left text-xs text-gray-200';
+            logItem.innerHTML = `
+                <div class="flex items-center justify-between mb-1.5">
+                    <strong class="text-[#00bcd4] font-bold uppercase tracking-wider">${q.title}</strong>
+                    <span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase ${isYes ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${isYes ? 'Fault Detected' : 'Healthy State'}</span>
+                </div>
+                <p class="mb-1 text-gray-200"><strong>Choice:</strong> ${isYes ? 'Yes, currently manifests.' : 'No, working stably.'}</p>
+                <p class="text-gray-300 italic"><strong>Protocol:</strong> ${answerText}</p>
+            `;
+            logContainer.appendChild(logItem);
+            logContainer.scrollTop = logContainer.scrollHeight;
+
+            currentStageIndex++;
+            renderQuestionStage();
+        }
+
+        function loadCompleteLayout() {
+            document.getElementById('quizQuestionPanel').classList.add('hidden');
+            document.getElementById('quizCompletePanel').classList.remove('hidden');
+            document.getElementById('quizProgressBar').innerText = `Stage Complete`;
+
+            // Display protocols list
+            document.getElementById('protocolPlaceholder').classList.add('hidden');
+            const logContainer = document.getElementById('protocolsLogContainer');
+            logContainer.innerHTML = '';
+            logContainer.classList.remove('hidden');
+
+            collectedResponses.forEach(res => {
+                const logItem = document.createElement('div');
+                const isYes = res.answer === 'Yes';
+                logItem.className = 'p-3 bg-[rgba(255,255,255,0.08)] rounded-xl border border-[rgba(255,255,255,0.08)] text-left text-xs text-gray-200';
+                logItem.innerHTML = `
+                    <div class="flex items-center justify-between mb-1.5">
+                        <strong class="text-[#00bcd4] font-bold uppercase tracking-wider">${res.stage}</strong>
+                        <span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase ${isYes ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${isYes ? 'Fault Detected' : 'Healthy State'}</span>
+                    </div>
+                    <p class="mb-1 text-gray-200"><strong>Choice:</strong> ${isYes ? 'Yes, currently manifests.' : 'No, working stably.'}</p>
+                    <p class="text-gray-300 italic"><strong>Protocol:</strong> ${res.protocol}</p>
+                `;
+                logContainer.appendChild(logItem);
+            });
+
+            // Save results to history
+            saveModuleResult('techcare', {
+                responses: collectedResponses
+            });
+
+            // Show save persistent indicator
+            document.getElementById('techcareSaveBadge').classList.remove('hidden');
+        }
+
+        function resetDiagnostics() {
+            if (confirm('Rerun evaluations? Previous protocols index records will be reset.')) {
+                currentStageIndex = 0;
+                collectedResponses = [];
+                
+                const logContainer = document.getElementById('protocolsLogContainer');
+                logContainer.innerHTML = '';
+                logContainer.classList.add('hidden');
+                
+                document.getElementById('protocolPlaceholder').classList.remove('hidden');
+                document.getElementById('techcareSaveBadge').classList.add('hidden');
+
+                // Clear history keys
+                const history = getSavedResults();
+                delete history.techcare;
+                localStorage.setItem('ecocircuit_saved_results', JSON.stringify(history));
+
+                renderQuestionStage();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoCircuit Collective — Sustainable Tech Habits</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script>
+        // Set Tailwind theme extensions
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nuTeal: '#14b8a6',
+                        nuAmber: '#f59e0b',
+                        nuDark: '#0c1929'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- NAVBAR INJECTION BOUNDARY -->
+    <div id="navbar-container"></div>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="flex-1">
+        <!-- HERO SECTION -->
+        <header class="hero-section">
+            <div class="hero-grid text-left">
+                <div class="hero-left">
+                    <h1 id="heroGreeting" class="tracking-tight leading-none text-white font-black">
+                        SUSTAINABLE E-WASTE<br />
+                        MANAGEMENT MADE<br />
+                        <span class="hero-accent">SIMPLE</span>
+                    </h1>
+                    <p class="hero-subtext">
+                        The Bulldog's guide to sustainable tech habits. Repair, Maintain, or Recycle responsibly.
+                    </p>
+                    <a href="tipid.html" class="btn-start-modules select-none text-center">
+                        START MODULES &darr;
+                    </a>
+                </div>
+
+                <div class="hero-right flex flex-col gap-4">
+                    <div class="hero-info-card border border-white/10 shadow-lg select-default">
+                        <p class="text-sm font-semibold mb-1 opacity-90 text-[#f59e0b] tracking-wide uppercase">Mission Goal</p>
+                        <p class="text-sm text-gray-200">
+                            EcoCircuit Collective promotes responsive tech maintenance to prevent chemical leaking and valuable mining losses.
+                        </p>
+                    </div>
+                    
+                    <div class="hero-info-card border border-white/10 shadow-lg select-default">
+                        <p class="text-sm font-semibold mb-1 opacity-90 text-[#f59e0b] tracking-wide uppercase">UN SDG Indicator</p>
+                        <p class="text-sm text-gray-200">
+                            Fulfilling United Nations SDG 12: Responsible Consumption &amp; Production on the National University Manila Campus.
+                        </p>
+                    </div>
+
+                    <!-- Device Info Badge -->
+                    <div id="deviceBadgeContainer"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ECOCIRCUIT FRAMEWORK SEPARATOR -->
+        <section class="framework-section h-full">
+            <div class="section-header">
+                <h2 class="section-title text-white font-extrabold tracking-wide mb-2 drop-shadow-sm/60">
+                    THE ECOCIRCUIT FRAMEWORK
+                </h2>
+                <p class="text-gray-300 text-sm max-w-xl mx-auto">
+                    Interactive, data-driven decisions that prolong material value, preserve your pocket, and prevent toxic waste.
+                </p>
+            </div>
+
+            <div class="grid-container max-w-7xl mx-auto">
+                <!-- TIPID TEASER CARD -->
+                <div class="card hover:border-emerald-400 p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="card-image-area tipid-img">
+                            <span class="card-img-icon">💸</span>
+                        </div>
+                        <h3 class="module-title font-extrabold text-[#f59e0b]">TIPID ANALYSIS</h3>
+                        <div class="module-desc-bar flex items-center">
+                            <span class="text-white text-xs">Save money and reduce unnecessary e-waste.</span>
+                        </div>
+                        <p class="text-xs text-gray-300 px-4 text-center mt-3 leading-relaxed">
+                            Run automated economic analysis to calculate the repair cost ratio, parts scarcity penalizations, and age longevity indicators.
+                        </p>
+                    </div>
+                    <a href="tipid.html" class="btn-action mt-6 select-none text-center">
+                        Open Tipid Analyzer &rarr;
+                    </a>
+                </div>
+
+                <!-- TECH-CARE TEASER CARD -->
+                <div class="card hover:border-cyan-400 p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="card-image-area techcare-img">
+                            <span class="card-img-icon">🔧</span>
+                        </div>
+                        <h3 class="module-title font-extrabold text-[#06b6d4]">TECH-CARE LOGIC</h3>
+                        <div class="module-desc-bar flex items-center">
+                            <span class="text-white text-xs">Maintain and repair devices responsibly.</span>
+                        </div>
+                        <p class="text-xs text-gray-300 px-4 text-center mt-3 leading-relaxed">
+                            Enter multi-stage hardware thermal diagnostics. Access our step-by-step DIY tutorial library and optimization guides.
+                        </p>
+                    </div>
+                    <a href="techcare.html" class="btn-action mt-6 select-none text-center">
+                        Launch Diagnostics &rarr;
+                    </a>
+                </div>
+
+                <!-- TRANSFER TEASER CARD -->
+                <div class="card hover:border-emerald-400 p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="card-image-area transfer-img">
+                            <span class="card-img-icon">♻️</span>
+                        </div>
+                        <h3 class="module-title font-extrabold text-[#10b981]">TRANSFER HUB</h3>
+                        <div class="module-desc-bar flex items-center">
+                            <span class="text-white text-xs">Responsible disposal and recycling solutions.</span>
+                        </div>
+                        <p class="text-xs text-gray-300 px-4 text-center mt-3 leading-relaxed">
+                            Determine proper reuse or salvage value routes. Identify verified drop-off bins around the National University campus.
+                        </p>
+                    </div>
+                    <a href="transfer.html" class="btn-action mt-6 select-none text-center">
+                        Evaluate Disposal &rarr;
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- STATS SEPARATOR -->
+        <section class="stats-section">
+            <div class="section-header text-center mb-12">
+                <h2 class="text-white font-extrabold text-3xl tracking-wide uppercase">
+                    WHY E-WASTE MATTERS
+                </h2>
+                <p class="text-gray-300 text-sm mt-1 max-w-xl mx-auto">
+                    Proper disposal isn't just a minor issue — it has immense logical and environmental consequences.
+                </p>
+            </div>
+
+            <div class="stats-grid max-w-5xl mx-auto">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-blue">🖥️</div>
+                    <div class="stat-content">
+                        <div class="stat-value text-white">62M <span class="stat-unit">Tons</span></div>
+                        <p class="stat-desc">Global electronic waste generated in 2022. This is projected to climb to 82M tons by 2030.</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-gold">💎</div>
+                    <div class="stat-content">
+                        <div class="stat-value text-white">$91B <span class="stat-unit">USD Lost</span></div>
+                        <p class="stat-desc">Valuable materials like copper, iron, and gold thrown out annually. Proper circuit salvage recovers this resource stream.</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-green">♻️</div>
+                    <div class="stat-content">
+                        <div class="stat-value text-white">22.3% <span class="stat-unit">Recycled</span></div>
+                        <p class="stat-desc">Only a tiny fraction of total international e-waste is formally verified, processed, and reintroduced into circular supply chains.</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-dark">⚠️</div>
+                    <div class="stat-content">
+                        <div class="stat-value text-white">85% <span class="stat-unit">Toxic Landfills</span></div>
+                        <p class="stat-desc">Most materials release mercury, lead, and flame retardants into the water supply line if disposed of in municipal regular bins.</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="stats-citation mt-8">
+                Source: World Health Organization &amp; International Telecommunication Union (WHO / ITU). (2024). <br />
+                <em>The Global E-waste Monitor 2024.</em>{' '}
+                <a href="https://www.itu.int/en/ITU-D/Environment/Pages/Spotlight/Global-Ewaste-Monitor-2024.aspx" target="_blank" rel="noreferrer">
+                    Official ITU Global Report Reference ↗
+                </a>
+            </p>
+        </section>
+
+        <!-- LOCATION DIRECTORY -->
+        <section id="directory-section" class="directory-wrapper select-default">
+            <div class="section-header">
+                <h2 class="directory-title text-3xl font-extrabold uppercase tracking-wide">
+                    CAMPUS DIRECTORY
+                </h2>
+                <p class="directory-sub">Find verified local e-waste drop-off bins or student repair hubs on the NU Manila campus.</p>
+            </div>
+
+            <div class="location-grid max-w-5xl mx-auto">
+                <!-- Location 1 -->
+                <div onclick="showLocationModal('dan')" class="loc-box repair-box transition-all">
+                    <div class="text-3xl mb-2">🔧</div>
+                    <h4 class="font-extrabold text-sm mb-1">Dan The Technician Repair</h4>
+                    <span class="loc-tag">Repair Hub</span>
+                </div>
+                <!-- Location 2 -->
+                <div onclick="showLocationModal('tovy')" class="loc-box repair-box transition-all">
+                    <div class="text-3xl mb-2">🔧</div>
+                    <h4 class="font-extrabold text-sm mb-1">Tovy's Cellphone Repair</h4>
+                    <span class="loc-tag">Repair Hub</span>
+                </div>
+                <!-- Location 3 -->
+                <div onclick="showLocationModal('orbanthic')" class="loc-box repair-box transition-all">
+                    <div class="text-3xl mb-2">🔧</div>
+                    <h4 class="font-extrabold text-sm mb-1">Orbanthics Repair Shop</h4>
+                    <span class="loc-tag">Repair Hub</span>
+                </div>
+                <!-- Location 4 -->
+                <div onclick="showLocationModal('annex')" class="loc-box waste-box transition-all">
+                    <div class="text-3xl mb-2">♻️</div>
+                    <h4 class="font-extrabold text-sm mb-1">NU Annex 2 Bin</h4>
+                    <span class="loc-tag">E-Waste Bin</span>
+                </div>
+                <!-- Location 5 -->
+                <div onclick="showLocationModal('jmb')" class="loc-box waste-box transition-all">
+                    <div class="text-3xl mb-2">♻️</div>
+                    <h4 class="font-extrabold text-sm mb-1">NU JMB Bin</h4>
+                    <span class="loc-tag">E-Waste Bin</span>
+                </div>
+                <!-- Location 6 -->
+                <div onclick="showLocationModal('mb')" class="loc-box waste-box transition-all">
+                    <div class="text-3xl mb-2">♻️</div>
+                    <h4 class="font-extrabold text-sm mb-1">NU MB 5th Floor Bin</h4>
+                    <span class="loc-tag">E-Waste Bin</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="max-w-7xl mx-auto text-center px-4">
+            <p class="text-xs mb-1 font-bold tracking-wide uppercase text-gray-500">EcoCircuit Collective &bull; National University Manila Campus</p>
+            <p class="text-[10px] text-gray-600">Built for sustainable desktop-mobile cross-device materials life-cycle evaluation and responsible e-waste tracking.</p>
+        </div>
+    </footer>
+
+    <!-- CORE SCRIPTS -->
+    <script src="./main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Enforce Authentication
+            if (!enforceAuthentication()) {
+                injectLoginModal();
+                return;
+            }
+
+            // 2. Fetch session details
+            const session = getSession();
+            if (session) {
+                // Inject Navbar
+                injectNavbar('home');
+
+                // Render Device Info Badge
+                const badgeContainer = document.getElementById('deviceBadgeContainer');
+                if (badgeContainer) {
+                    const dev = session.selectedDevice;
+                    let emoji = '❓';
+                    let label = 'No Target Chosen';
+                    if (dev === 'cellphone') { emoji = '📱'; label = 'Cellphone'; }
+                    if (dev === 'laptop') { emoji = '💻'; label = 'Laptop'; }
+                    if (dev === 'tablet') { emoji = '📲'; label = 'Tablet'; }
+
+                    badgeContainer.innerHTML = `
+                        <div id="deviceInfo" class="device-info-badge animate-fadeIn">
+                            <div class="flex items-center gap-3">
+                                <span class="text-[11px] font-bold text-gray-200 tracking-wide">Evaluating: <strong class="text-white">${label}</strong></span>
+                            </div>
+                            <button class="btn-change-device shadow hover:scale-105 active:scale-95" onclick="injectDeviceModal()">
+                                Change Device
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+
+            // 3. Lucide icons build trigger
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        });
+    </script>
+</body>
+</html>

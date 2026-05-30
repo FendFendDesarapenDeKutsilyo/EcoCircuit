@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipid Analyzer — EcoCircuit Collective</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nuBlue: '#35408e',
+                        nuGold: '#ffd400',
+                        nuDark: '#242b5e'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f3d9e 0%, #1565c0 40%, #2196f3 80%, #42a5f5 100%);
+        }
+        .module-header-badge {
+            display: inline-block;
+            background: rgba(255,212,0,0.15);
+            color: var(--nu-gold);
+            border: 1px solid rgba(255,212,0,0.25);
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- NAVBAR INJECTION BOUNDARY -->
+    <div id="navbar-container"></div>
+
+    <!-- MAIN MODULE CONTENT -->
+    <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-8">
+        <!-- HEADER -->
+        <header class="mb-8">
+            <span class="module-header-badge">
+                MODULE 01 — FINANCIAL PERSISTENCE
+            </span>
+            <h1 class="text-white text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">
+                💰 TIPID ECONOMIC ANALYZER
+            </h1>
+            <p class="text-blue-100 text-sm max-w-2xl">
+                Enter your device's repair specifications compared to native retail value. The system computes parts scarcity penalties and physical damage depreciation indexes to decide whether repairing is highly sustainable!
+            </p>
+        </header>
+
+        <!-- TWO-COLUMN WORKSPACE -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mb-12">
+            
+            <!-- INPUT FORM PANEL (NAVY CARD) -->
+            <section class="card p-6">
+                <h2 class="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                    <span class="text-[var(--nu-gold)]">📊</span> Specifications Sheet
+                </h2>
+
+                <div class="mini-tool space-y-4">
+                    <div>
+                        <label id="repairCostLabel" class="block text-xs font-bold text-gray-300 mb-1">
+                            Estimated Repair Cost (₱)
+                        </label>
+                        <input type="number" id="repairPrice" placeholder="e.g. 2500" required>
+                    </div>
+
+                    <div>
+                        <label id="newCostLabel" class="block text-xs font-bold text-gray-300 mb-1">
+                            New <span id="targetDeviceLabel">Device</span> Cost (₱)
+                        </label>
+                        <input type="number" id="newPhonePrice" placeholder="e.g. 15000" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">
+                            Parts Sourcing Availability
+                        </label>
+                        <select id="partsAvail">
+                            <option value="readily_available">Readily Available (OEM standard parts exists)</option>
+                            <option value="scarce">Scarce / Rare Sourcing Required (+15% Scarcity Penalty)</option>
+                            <option value="obsolete">Obsolete (No certified components available — Avoid repair)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">
+                            Outer Physical Structural Damage
+                        </label>
+                        <select id="physDamage">
+                            <option value="minor">Minor Scribing / Scratches (No impact)</option>
+                            <option value="moderate">Moderate Chassis Chips / Screen Cracks (+10% Penalty)</option>
+                            <option value="severe">Severe Frame Bent / Fractured Motherboards (Avoid repair)</option>
+                        </select>
+                    </div>
+
+                    <button id="btn-calc-tipid" onclick="runTipidCalculation()" class="btn-action w-full justify-center select-none cursor-pointer">
+                        Evaluate Feasibility Study &darr;
+                    </button>
+                </div>
+            </section>
+
+            <!-- RECOMMENDATION RESULTS CARD (NAVY) -->
+            <section class="card p-6 min-h-[350px] flex flex-col justify-between">
+                <div>
+                    <h2 class="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                        <span class="text-[#2ecc71]">💡</span> Evaluation Result
+                    </h2>
+                    
+                    <!-- EMPTY STATE -->
+                    <div id="resultEmptyState" class="text-center py-12 text-gray-400">
+                        <div class="text-5xl mb-3">📈</div>
+                        <p class="text-sm font-semibold text-white">Ready to Analyze</p>
+                        <p class="text-xs text-gray-400 mt-1">Provide estimates to trigger the cost-of-ownership decision matrix.</p>
+                    </div>
+
+                    <!-- SUCCESS STATE -->
+                    <div id="tipid-result" class="hidden animate-fadeIn">
+                        <div id="recommendationBadge" class="p-4 rounded-xl border font-black text-xl mb-4 text-center">
+                            <!-- JS Inject -->
+                        </div>
+                        <div class="bg-[rgba(255,255,255,0.08)] p-4 rounded-xl border border-[rgba(255,255,255,0.08)] mb-4">
+                            <span class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Decision Background Reasoning:</span>
+                            <p id="recommendationReason" class="text-sm leading-relaxed text-gray-200">
+                                <!-- JS Inject -->
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SAVE HISTORY HINT -->
+                <div id="saveNotification" class="hidden text-center text-xs font-semibold text-[#2ecc71] py-2 border-t border-[rgba(255,255,255,0.08)] mt-4">
+                    ⚡ Evaluation persisted securely under Local History.
+                </div>
+            </section>
+
+        </div>
+
+        <!-- REPAIR GUIDANCE ACCORDION / EXTRA CONTENT -->
+        <section class="mb-12">
+            <h2 class="text-white font-extrabold text-xl mb-4 uppercase tracking-wide">
+                Circular Economic Guidance
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-[var(--card-navy)] border border-[rgba(255,255,255,0.08)] rounded-2xl p-5 hover:border-[#ffd400]/40 transition-colors">
+                    <h3 class="text-[#ffd400] font-bold text-sm mb-2 uppercase tracking-wider">💡 The 50% Economic Logic</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed">
+                        If estimated repairs breach 50% of buying a modern equal product, replacing generally provides better material reliability, unless the device carries custom components.
+                    </p>
+                </div>
+                <div class="bg-[var(--card-navy)] border border-[rgba(255,255,255,0.08)] rounded-2xl p-5 hover:border-[#ffd400]/40 transition-colors">
+                    <h3 class="text-[#ffd400] font-bold text-sm mb-2 uppercase tracking-wider">🛠️ Parts Sourcing Impact</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed">
+                        Extremely rare logic panels increase delivery overhead. Opting for third-party certified repair shops often manages total repair costs below corporate quotes.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="max-w-7xl mx-auto text-center px-4">
+            <p class="text-xs mb-1 font-bold tracking-wide uppercase text-gray-500">EcoCircuit Collective &bull; National University Manila Campus</p>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="./main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check auth
+            if (!enforceAuthentication()) {
+                injectLoginModal();
+                return;
+            }
+
+            // Injects navbar
+            injectNavbar('tipid');
+
+            // Populate target device mode
+            const session = getSession();
+            if (session) {
+                const targetLabel = document.getElementById('targetDeviceLabel');
+                const dev = session.selectedDevice;
+                let deviceText = 'Device';
+                if (dev === 'cellphone') deviceText = 'Cellphone';
+                if (dev === 'laptop') deviceText = 'Laptop';
+                if (dev === 'tablet') deviceText = 'Tablet';
+                targetLabel.textContent = deviceText;
+
+                // Restore previous calculation if exists
+                const savedHistory = getSavedResults();
+                if (savedHistory && savedHistory.tipid) {
+                    const saved = savedHistory.tipid;
+                    document.getElementById('repairPrice').value = saved.repairCost;
+                    document.getElementById('newPhonePrice').value = saved.newPrice;
+                    document.getElementById('partsAvail').value = saved.partsAvail;
+                    document.getElementById('physDamage').value = saved.physDamage;
+                    
+                    // Display calculation results immediately
+                    displayTipidResult(saved.result);
+                }
+            }
+        });
+
+        function runTipidCalculation() {
+            const repairCost = parseFloat(document.getElementById('repairPrice').value);
+            const newPrice = parseFloat(document.getElementById('newPhonePrice').value);
+            const partsAvail = document.getElementById('partsAvail').value;
+            const physDamage = document.getElementById('physDamage').value;
+
+            if (isNaN(repairCost) || isNaN(newPrice) || repairCost < 0 || newPrice <= 0) {
+                alert('Please register valid positive numerical sums for estimates.');
+                return;
+            }
+
+            const session = getSession();
+            const username = session ? session.studentName : 'Bulldog';
+
+            // Calculate ratios & penalties in main.js core function
+            const result = evaluateTipidFormula(repairCost, newPrice, partsAvail, physDamage, username);
+
+            // Save results to history
+            saveModuleResult('tipid', {
+                repairCost,
+                newPrice,
+                partsAvail,
+                physDamage,
+                result
+            });
+
+            // Trigger animations
+            displayTipidResult(result);
+
+            // Display persistent success notification
+            const saveNotif = document.getElementById('saveNotification');
+            saveNotif.classList.remove('hidden');
+            setTimeout(() => {
+                saveNotif.classList.add('hidden');
+            }, 3000);
+        }
+
+        function displayTipidResult(result) {
+            document.getElementById('resultEmptyState').classList.add('hidden');
+            const resultBox = document.getElementById('tipid-result');
+            resultBox.classList.remove('hidden');
+
+            const badge = document.getElementById('recommendationBadge');
+            badge.innerText = result.rec;
+            badge.style.backgroundColor = result.color + '22';
+            badge.style.borderColor = result.color + '66';
+            badge.style.color = result.color;
+
+            document.getElementById('recommendationReason').innerText = result.reason;
+        }
+    </script>
+</body>
+</html>
