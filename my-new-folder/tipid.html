@@ -182,16 +182,13 @@
     <script src="./main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Check auth
             if (!enforceAuthentication()) {
                 injectLoginModal();
                 return;
             }
 
-            // Injects navbar
             injectNavbar('tipid');
 
-            // Populate target device mode
             const session = getSession();
             if (session) {
                 const targetLabel = document.getElementById('targetDeviceLabel');
@@ -202,7 +199,6 @@
                 if (dev === 'tablet') deviceText = 'Tablet';
                 targetLabel.textContent = deviceText;
 
-                // Restore previous calculation if exists
                 const savedHistory = getSavedResults();
                 if (savedHistory && savedHistory.tipid) {
                     const saved = savedHistory.tipid;
@@ -210,14 +206,12 @@
                     document.getElementById('newPhonePrice').value = saved.newPrice;
                     document.getElementById('partsAvail').value = saved.partsAvail;
                     document.getElementById('physDamage').value = saved.physDamage;
-                    
-                    // Display calculation results immediately
                     displayTipidResult(saved.result);
                 }
             }
         });
 
-        function runTipidCalculation() {
+        async function runTipidCalculation() {
             const repairCost = parseFloat(document.getElementById('repairPrice').value);
             const newPrice = parseFloat(document.getElementById('newPhonePrice').value);
             const partsAvail = document.getElementById('partsAvail').value;
@@ -229,29 +223,56 @@
             }
 
             const session = getSession();
-            const username = session ? session.studentName : 'Bulldog';
+            const deviceType = session && session.selectedDevice ? session.selectedDevice : 'laptop';
+            const conditions = { partsAvail, physDamage };
 
-            // Calculate ratios & penalties in main.js core function
-            const result = evaluateTipidFormula(repairCost, newPrice, partsAvail, physDamage, username);
+            // Show loading state
+            const badge = document.getElementById('recommendationBadge');
+            badge.innerText = '⏳ Computing backend analysis...';
+            badge.style.backgroundColor = '#ffffff22';
+            badge.style.borderColor = '#ffffff44';
+            badge.style.color = '#ffffff';
 
-            // Save results to history
-            saveModuleResult('tipid', {
-                repairCost,
-                newPrice,
-                partsAvail,
-                physDamage,
-                result
-            });
+            try {
+                // Call real backend API — no fallback
+                const apiResult = await callApi('POST', '/api/tipid/evaluate', {
+                    deviceType,
+                    age: 2,
+                    newPrice,
+                    repairCost,
+                    conditions,
+                });
 
-            // Trigger animations
-            displayTipidResult(result);
+                // Map backend response to frontend format
+                const result = {
+                    rec: apiResult.recommendation || 'Assessment Complete',
+                    reason: apiResult.reason || 'Backend analysis completed.',
+                    color: apiResult.color || '#10b981',
+                };
 
-            // Display persistent success notification
-            const saveNotif = document.getElementById('saveNotification');
-            saveNotif.classList.remove('hidden');
-            setTimeout(() => {
-                saveNotif.classList.add('hidden');
-            }, 3000);
+                saveModuleResult('tipid', {
+                    repairCost,
+                    newPrice,
+                    partsAvail,
+                    physDamage,
+                    result
+                });
+
+                displayTipidResult(result);
+
+                const saveNotif = document.getElementById('saveNotification');
+                saveNotif.classList.remove('hidden');
+                setTimeout(() => saveNotif.classList.add('hidden'), 3000);
+
+            } catch (err) {
+                // Show the error to user — no silent fallback
+                displayTipidResult({
+                    rec: '❌ Backend Unavailable',
+                    reason: 'The server could not process the request. Make sure the server is running (npm start). Error: ' + err.message,
+                    color: '#ef4444',
+                });
+                console.error('[EcoCircuit] Tipid API error:', err);
+            }
         }
 
         function displayTipidResult(result) {
