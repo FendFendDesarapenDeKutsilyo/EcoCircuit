@@ -222,110 +222,60 @@
             const screenFunctional = document.getElementById('t-screen').value;
             const waterDamaged = document.getElementById('t-water').value;
 
-            // Show loading state
-            const titleBadge = document.getElementById('transferTitleBadge');
-            titleBadge.innerText = '⏳ Contacting backend analysis engine...';
-            titleBadge.style.backgroundColor = '#ffffff22';
-            titleBadge.style.borderColor = '#ffffff44';
-            titleBadge.style.color = '#ffffff';
-
             const session = getSession();
-            const deviceType = session && session.selectedDevice ? session.selectedDevice : 'laptop';
-            const conditions = {
+            const deviceType = session?.selectedDevice || 'cellphone';
+
+            let result;
+
+            try {
+                // Try backend API first
+                const data = await apiFetch('POST', '/api/transfer/evaluate/anonymous', {
+                    deviceType,
+                    age: 0,
+                    conditions: {
+                        hasPower: powersOn,
+                        batteryHealth: batterySwollen,
+                        screenIntact: screenFunctional,
+                        waterDamage: waterDamaged
+                    }
+                });
+                // Map backend response to frontend display format
+                result = {
+                    title: data.outcome || 'Transfer Evaluation Result',
+                    resale: {
+                        summary: data.resaleSummary || 'Evaluation complete.',
+                        estimate: data.resaleEstimate || ''
+                    },
+                    recycle: {
+                        summary: data.recycleSummary || 'See guidance below.',
+                        guidance: data.recycleGuidance || 'Follow responsible disposal procedures.'
+                    },
+                    color: data.color || '#10b981'
+                };
+                console.log('[TRANSFER] Backend result:', data);
+            } catch (err) {
+                // Fallback to local calculation
+                console.warn('[TRANSFER] Backend unavailable, using local calculation:', err.message);
+                result = evaluateTransferFormula(powersOn, batterySwollen, screenFunctional, waterDamaged);
+            }
+
+            displayTransferResult(result);
+
+            // Persist locally
+            saveModuleResult('transfer', {
                 powersOn,
                 batterySwollen,
                 screenFunctional,
                 waterDamaged,
-                partsSalvageable: powersOn === 'yes' && screenFunctional === 'no' ? 'yes' : 'no',
-                cosmeticDamage: 'none',
-                deviceAgeLessThan3: 'yes',
-            };
+                result
+            });
 
-            try {
-                // Call real backend API — no fallback
-                const apiResult = await callApi('POST', '/api/transfer/evaluate', {
-                    deviceType,
-                    age: 2,
-                    conditions,
-                });
-
-                // Map backend decision tree result to frontend format
-                const outcome = apiResult.outcome || '';
-                let title = '🔄 Transfer Assessment';
-                let color = apiResult.color || '#3b82f6';
-                let resaleSummary = 'Analysis complete from backend.';
-                let resaleEstimate = '';
-                let recycleSummary = 'Review the recommendation below.';
-                let recycleGuidance = '';
-
-                if (outcome.includes('DANGER') || outcome.includes('BATTERY')) {
-                    title = '🚨 Lithium Battery Danger: Immediate Isolation Required';
-                    color = '#ef4444';
-                    resaleSummary = 'Battery swelling signals chemical outgassing. Sourcing motherboard power is hazardous.';
-                    resaleEstimate = 'Motherboard value: ₱200 - ₱500';
-                    recycleSummary = 'Battery and electronics should be recycled through certified e-waste centers.';
-                    recycleGuidance = 'Handle with extreme safety. Isolate in secure, dry sand buckets and discard at campus collection boxes.';
-                } else if (outcome.includes('RECYCLE')) {
-                    title = '♻️ Recycle Recommended';
-                    color = '#10b981';
-                    resaleSummary = 'This device has limited resale potential.';
-                    resaleEstimate = 'Estimated salvage value: ₱100 - ₱500';
-                    recycleSummary = 'Recycle at a certified e-waste facility.';
-                    recycleGuidance = 'Place in designated e-waste collection bins on campus.';
-                } else if (outcome.includes('SELL')) {
-                    title = outcome.includes('PARTS') ? '🔨 Parts Salvageable' : '💰 Sellable Device';
-                    color = outcome.includes('PARTS') ? '#f59e0b' : '#10b981';
-                    resaleSummary = apiResult.message || 'Functional components have resale value.';
-                    resaleEstimate = 'Estimated value: ₱700 - ₱5,000';
-                    recycleSummary = 'Recycle damaged parts separately.';
-                    recycleGuidance = 'Wipe all data before selling or donating.';
-                } else if (outcome.includes('REPAIR')) {
-                    title = '🛠️ Repair Recommended First';
-                    color = '#f39c12';
-                    resaleSummary = 'Device is repairable. Get an estimate before deciding.';
-                    resaleEstimate = 'Repair cost varies by issue.';
-                    recycleSummary = 'Recycle only if repair cost exceeds 50% of device value.';
-                    recycleGuidance = 'Visit a certified repair center for assessment.';
-                } else {
-                    title = apiResult.message || '🔌 Device Assessment Complete';
-                    resaleSummary = apiResult.message || 'Evaluation completed by backend.';
-                    resaleEstimate = '';
-                    recycleSummary = 'Follow responsible disposal practices.';
-                    recycleGuidance = 'Use campus e-waste collection points.';
-                }
-
-                const result = {
-                    title,
-                    resale: { summary: resaleSummary, estimate: resaleEstimate },
-                    recycle: { summary: recycleSummary, guidance: recycleGuidance },
-                    color,
-                };
-
-                displayTransferResult(result);
-
-                // Persist locally
-                saveModuleResult('transfer', {
-                    powersOn,
-                    batterySwollen,
-                    screenFunctional,
-                    waterDamaged,
-                    result
-                });
-
-                const badge = document.getElementById('transferSaveBadge');
-                badge.classList.remove('hidden');
-                setTimeout(() => badge.classList.add('hidden'), 3000);
-
-            } catch (err) {
-                // Show the error to user — no silent fallback
-                displayTransferResult({
-                    title: '❌ Backend Unavailable',
-                    resale: { summary: 'The server could not process the request.', estimate: '' },
-                    recycle: { summary: 'Make sure the server is running (npm start).', guidance: 'Error: ' + err.message },
-                    color: '#ef4444',
-                });
-                console.error('[EcoCircuit] Transfer API error:', err);
-            }
+            // Show save indicators
+            const badge = document.getElementById('transferSaveBadge');
+            badge.classList.remove('hidden');
+            setTimeout(() => {
+                badge.classList.add('hidden');
+            }, 3000);
         }
 
         function displayTransferResult(result) {

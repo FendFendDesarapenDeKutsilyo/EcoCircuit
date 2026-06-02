@@ -1,11 +1,38 @@
 /**
  * ECOCIRCUIT COLLECTIVE — CORE SHARED SCRIPT
- * Handles shared sessions, login modal integration, nav injections,
- * multi-page routing values, and API communication.
- * NO local fallback logic — real backend data only.
+ * Handles shared sessions, login modal integration, standard calculations, 
+ * nav injections, and multi-page routing values.
  */
 
 const API_BASE = window.location.origin;
+
+/* ── API Helper ── */
+async function apiFetch(method, path, body = null, skipAuth = false) {
+    const url = `${API_BASE}${path}`;
+    const headers = { 'Content-Type': 'application/json' };
+    
+    if (!skipAuth) {
+        const token = getAuthToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const opts = { method, headers };
+    if (body !== null) opts.body = JSON.stringify(body);
+
+    const res = await fetch(url, opts);
+    const data = await res.json();
+    
+    if (!res.ok) {
+        throw new Error(data.message || data.error || `Request failed (${res.status})`);
+    }
+    
+    return data;
+}
+
+function getAuthToken() {
+    const session = getSession();
+    return session?.authToken || null;
+}
 
 const LOCATION_DATA = {
     dan: {
@@ -52,44 +79,77 @@ const LOCATION_DATA = {
     }
 };
 
-// ==========================================
-// API CALLER
-// ==========================================
-
-/**
- * Reads the auth token from the current session.
- */
-function getAuthToken() {
-    const session = getSession();
-    return session && session.authToken ? session.authToken : null;
-}
-
-/**
- * Generic API caller. Throws on failure — no silent fallback.
- *
- * @param {string} method - HTTP method
- * @param {string} path   - API path (e.g. '/api/tipid/evaluate')
- * @param {Object} [body] - Request body
- * @returns {Promise<Object>} Parsed JSON response
- */
-async function callApi(method, path, body) {
-    const headers = { 'Content-Type': 'application/json' };
-    const token = getAuthToken();
-    if (token) {
-        headers['Authorization'] = 'Bearer ' + token;
-    }
-    const opts = { method, headers };
-    if (body && method !== 'GET') {
-        opts.body = JSON.stringify(body);
-    }
-    const url = API_BASE + path;
-    const res = await fetch(url, opts);
-    if (!res.ok) {
-        const errBody = await res.json().catch(() => ({ message: res.statusText }));
-        throw new Error(errBody.message || `API returned ${res.status}: ${res.statusText}`);
-    }
-    return await res.json();
-}
+const TECHCARE_QUESTIONS = {
+    cellphone: [
+        {
+            title: 'Stage 1: Battery Health Check',
+            prompt: 'Does your phone randomly shut down or die before reaching 1%?',
+            yesResponse: '🔋 Calibration Reset needed! Turn off, charge to 100% uninterrupted, run complete drain loop, once fully empty recharge to 100% fully undisturbed.',
+            noResponse: '✅ Excellent! Your battery is operating efficiently. Avoid frequent discharges below 15% to maintain long longevity.',
+            issueTag: 'battery'
+        },
+        {
+            title: 'Stage 2: Device Overheating',
+            prompt: 'Is your phone uncomfortably hot to touch during typical reading or classroom tasks?',
+            yesResponse: '⚠️ Thermal Throttle! Remove immediate rubber casework. Liquid metal backplates retain heat. Cool in shade; never charge in a closed hot pocket.',
+            noResponse: '✅ Cool thermals! Heat causes lithium degradation. Keeping charging temperatures room-ambient safeguards internal circuit life.',
+            issueTag: 'thermal'
+        },
+        {
+            title: 'Stage 3: CPU & Storage Fatigue',
+            prompt: 'Do apps frequently lock up or does typing input lag behind your fingers?',
+            yesResponse: '🧹 Clear Buffer cache. Move WhatsApp/Telegram/Messenger media archives off native partition. Leave at minimum 15% space free.',
+            noResponse: '✅ Balanced system indexing! Sustaining dynamic block space storage ensures prompt cache write speeds.',
+            issueTag: 'performance'
+        }
+    ],
+    laptop: [
+        {
+            title: 'Stage 1: Battery Level Cycle',
+            prompt: 'Does your laptop battery collapse in less than 90 minutes of standard note-taking?',
+            yesResponse: '🔋 Run battery diagnostics report via Terminal `powercfg /batteryreport`. Check the design capacity ratio. Consider cell calibration reset.',
+            noResponse: '✅ Good battery cell index. Continue restricting extreme charge values: run on cable only occasionally to trigger native discharge loops.',
+            issueTag: 'battery'
+        },
+        {
+            title: 'Stage 2: Airflow Throttling Check',
+            prompt: 'Do cooling fans engage immediately at maximum volume, accompanied by chassis heat?',
+            yesResponse: '💨 Blocked Vents! Carefully blow canned compressed air into the side exhaust fins. Lift the back angle using rubber wedges or table stands.',
+            noResponse: '✅ Vents are clear. Safe heat dispensation extends motherboard components lifespan.',
+            issueTag: 'thermal'
+        },
+        {
+            title: 'Stage 3: Disk I/O Throttling check',
+            prompt: 'Does the laptop take over 2 minutes to boot into desktop or launch simple browsers?',
+            yesResponse: '🧹 Turn off autostart utilities using Task Manager dashboard. Clean cache temp logs. Consider swapping spinning HDD platter panels with Solid State SSD.',
+            noResponse: '✅ Swift filesystem response index detects healthy file structures.',
+            issueTag: 'performance'
+        }
+    ],
+    tablet: [
+        {
+            title: 'Stage 1: Lithium Charging Stability',
+            prompt: 'Does your tablet screen battery indicator flicker or jump multiple percents instantly?',
+            yesResponse: '🔋 Defective controller sensor signals calibration error. Charge continuously inside recovery-loader state for 4 hours to align battery indicators.',
+            noResponse: '✅ Power controller cell synchronization is consistent. Ensure clean socket connections.',
+            issueTag: 'battery'
+        },
+        {
+            title: 'Stage 2: Display responsiveness Check',
+            prompt: 'Do touch commands fail to register or cause jittery phantom typing?',
+            yesResponse: '📱 Clean screen with microfiber and anhydrous isopropyl alcohol. Touch responses lag if grease residues attract moisture.',
+            noResponse: '✅ Capacitive panel registration is functional.',
+            issueTag: 'touchscreen'
+        },
+        {
+            title: 'Stage 3: Cloud & Network Optimization',
+            prompt: 'Does your tablet experience slowdowns when multiple online tabs are opened?',
+            yesResponse: '🧹 Reset network sockets settings list. Disable background app synchronizations. Back up media onto cloud directories to save SSD partitions.',
+            noResponse: '✅ Maintained RAM headroom ensures pristine rendering performance.',
+            issueTag: 'storage'
+        }
+    ]
+};
 
 // ==========================================
 // SESSION CONTROLLER
@@ -127,7 +187,8 @@ function saveModuleResult(moduleKey, data) {
 
 function logout() {
     if (confirm('Are you sure you want to log out of your EcoCircuit session?')) {
-        callApi('POST', '/api/auth/logout').catch(() => {});
+        // Try to call backend logout (best-effort)
+        try { apiFetch('POST', '/api/auth/logout').catch(() => {}); } catch(e) {}
         localStorage.removeItem('ecocircuit_session');
         localStorage.removeItem('ecocircuit_saved_results');
         window.location.href = 'index.html';
@@ -143,6 +204,7 @@ function injectNavbar(activePage) {
     if (!navContainer) return;
 
     if (!session) {
+        // Redundant injection guard: navbar is empty if not authenticated
         navContainer.innerHTML = '';
         return;
     }
@@ -199,6 +261,7 @@ function enforceAuthentication() {
 
     if (!session) {
         if (currentLoc !== 'index.html') {
+            // Redirect standard unauthenticated traffic to main page to complete auth modal
             window.location.href = 'index.html';
         }
         return false;
@@ -218,6 +281,7 @@ function injectLoginModal() {
     overlay.className = 'auth-modal-overlay';
     overlay.innerHTML = `
         <div class="auth-modal-content max-w-sm w-11/12 text-left" id="modalContainer">
+            <!-- STEP 1: CREDENTIALS -->
             <div id="authStepCredentials" class="animate-fadeIn">
                 <div class="auth-logo">
                     ⚡ ECO<span style="color:var(--nu-gold)">CIRCUIT</span>
@@ -252,6 +316,7 @@ function injectLoginModal() {
                 </form>
             </div>
 
+            <!-- STEP 2: PROFILE DEVICE -->
             <div id="authStepDevice" class="hidden animate-fadeIn text-center">
                 <h2 class="text-center font-extrabold text-xl mb-1">
                     What device is analyzed, <span id="authGreetingName"></span>?
@@ -288,7 +353,7 @@ function injectLoginModal() {
 
 let tempAuthData = null;
 
-function handleAuthSubmit(event) {
+async function handleAuthSubmit(event) {
     event.preventDefault();
     const idVal = document.getElementById('authInputId').value.trim();
     const nameVal = document.getElementById('authInputName').value.trim();
@@ -300,6 +365,24 @@ function handleAuthSubmit(event) {
 
     tempAuthData = { studentId: idVal, studentName: nameVal };
 
+    // Try backend authentication (auto-login via institutional email)
+    try {
+        const email = `${idVal}@national-u.edu.ph`;
+        const password = `NU${idVal}2026`; // Standard institutional password derivation
+        const result = await apiFetch('POST', '/api/auth/login', {
+            email,
+            password
+        }, true);
+        // Store the JWT token with session data
+        tempAuthData.authToken = result.token;
+        tempAuthData.backendUserId = result.user?.userId;
+        console.log('[EcoCircuit] Backend auth successful, JWT stored.');
+    } catch (err) {
+        // Backend unavailable — continue with local-only auth (fallback)
+        console.warn('[EcoCircuit] Backend auth unavailable, using local session:', err.message);
+    }
+
+    // Move to device step
     document.getElementById('authStepCredentials').classList.add('hidden');
     document.getElementById('authStepDevice').classList.remove('hidden');
     document.getElementById('authGreetingName').innerText = nameVal;
@@ -312,7 +395,8 @@ function handleSelectDevice(deviceType) {
         selectedDevice: deviceType
     };
     setSession(finalUser);
-
+    
+    // Close modal & reload page
     const overlay = document.getElementById('loginModalOverlay');
     if (overlay) overlay.remove();
     window.location.reload();
@@ -331,7 +415,7 @@ function injectDeviceModal() {
             <span class="close-modal" onclick="closeDeviceModal()">&times;</span>
             <h2 class="text-center font-extrabold text-2xl mb-2">Change Evaluation Target</h2>
             <p class="text-center text-xs mb-6">Select the new category profile for customized guides.</p>
-
+            
             <div class="device-selector">
                 <button onclick="changeDeviceProfile('cellphone')" class="device-option card-action hover:border-[#ffd400] scale-95 hover:scale-100 transition-all select-none cursor-pointer p-4">
                     <div class="device-icon text-3xl mb-1">📱</div>
@@ -388,14 +472,14 @@ function showLocationModal(key) {
             <span class="inline-block text-xs font-black ${isRepair ? 'bg-amber-100 text-[#b8860b] border-amber-200' : 'bg-emerald-100 text-[#2e7d32] border-emerald-200'} px-3 py-1 rounded-full border mb-4 uppercase tracking-widest">${tagText}</span>
             <h2 class="font-extrabold text-2xl mb-2">${loc.title}</h2>
             <p class="modal-address text-sm font-semibold mb-3">${loc.address}</p>
-
+            
             <img class="modal-img mb-4" src="${loc.img}" alt="${loc.title}">
-
+            
             <div class="modal-directions">
                 <span class="block text-xs font-black text-gray-500 uppercase tracking-wider mb-1">Campus Directions:</span>
                 <p class="text-sm">${loc.direction}</p>
             </div>
-
+            
             <button onclick="closeLocationModal()" class="btn-action w-full mt-6">
                 Understand Directions
             </button>
@@ -407,4 +491,130 @@ function showLocationModal(key) {
 function closeLocationModal() {
     const overlay = document.getElementById('locationModalOverlay');
     if (overlay) overlay.remove();
+}
+
+
+// ==========================================
+// CORE COMPUTATION ENGINES (Fallback — used when backend is unavailable)
+// ==========================================
+function evaluateTipidFormula(repairCost, newPrice, partsAvail, physDamage, username) {
+    if (partsAvail === 'obsolete') {
+        return {
+            rec: '❌ Do Not Repair (Obsolete)',
+            reason: 'Parts for this circuit profile are officially obsolete. Sourcing replacement panels produces severe secondary e-waste overhead.',
+            color: '#ef4444'
+        };
+    }
+    if (physDamage === 'severe') {
+        return {
+            rec: '❌ Replace & Transfer Device',
+            reason: 'Severe frame breakdown indicates micro-fractures in general circuitry panels. Economic repair is impossible.',
+            color: '#ef4444'
+        };
+    }
+
+    const ratio = repairCost / newPrice;
+    let penalty = 0;
+    if (partsAvail === 'scarce') penalty += 0.15;
+    if (physDamage === 'moderate') penalty += 0.10;
+
+    const effectiveRatio = ratio + penalty;
+    const percent = Math.round(effectiveRatio * 100);
+
+    const greeting = username ? `Hey, ${username}! ` : '';
+
+    if (effectiveRatio < 0.35) {
+        return {
+            rec: `${greeting}✅ Recommend Strong Repair`,
+            reason: `Your computed cost scale burden index is ${percent}%. Repairing this device is both economically optimal and highly sustainable.`,
+            color: '#10b981'
+        };
+    } else if (effectiveRatio < 0.55) {
+        return {
+            rec: `${greeting}⚠️ Boundary Decision Zone`,
+            reason: `Your computed cost scale burden index is ${percent}%. Consider secondary conditions like device age, battery performance decay index, and trade-in opportunities.`,
+                    color: '#f59e0b'
+        };
+    } else {
+        return {
+            rec: `${greeting}❌ Recommend Replacement & Recycle`,
+            reason: `Your computed cost scale burden index is ${percent}%. This heavily breaches resource thresholds. Recycle broken electronics responsibly.`,
+            color: '#ef4444'
+        };
+    }
+}
+
+function evaluateTransferFormula(powersOn, batterySwollen, screenFunctional, waterDamaged) {
+    if (powersOn === 'yes') {
+        if (batterySwollen === 'yes') {
+            return {
+                title: '🚨 Lithium Battery Danger: Immediate Isolation Required',
+                resale: {
+                    summary: 'Battery swelling signals standard chemical outgassing inside cell pouches. Sourcing motherboard power is extremely hazardous.',
+                    estimate: 'Motherboard value: ₱200 - ₱500'
+                },
+                recycle: {
+                    summary: 'Battery and internal electronics should be recycled through certified e-waste centers. Do not attempt to open or reuse the swollen battery.',
+                    guidance: 'Handle with extreme safety. Isolate screen container inside secure, dry sand buckets and discard only at dedicated campus collection boxes immediately.'
+                },
+                color: '#ef4444'
+            };
+        } else {
+            if (screenFunctional === 'yes') {
+                return {
+                    title: '💰 Fully Operational — High Re-commerce Value',
+                    resale: {
+                        summary: 'Excellent! The screen works and power signals are healthy. Motherboard board and processor chips enjoy premium secondary market liquid salvage lines.',
+                        estimate: 'Estimated resell value: ₱2,500 - ₱5,000 depending on condition.'
+                    },
+                    recycle: {
+                        summary: 'If any cosmetic parts are damaged, separate them for recycling and retain working electronics for resale.',
+                        guidance: 'Reset credentials and execute a secure user files scrub. Deliver to nearby repair hub or online marketplaces for second-life student distribution.'
+                    },
+                    color: '#10b981'
+                };
+            } else {
+                return {
+                    title: '🔨 Parts Salvageable / Core Processor Intact',
+                    resale: {
+                        summary: 'Power is present but the screen is not functional. Salvage the motherboard, battery, camera, and charging port.',
+                        estimate: 'Estimated core components trade-in: ₱700 - ₱1,800'
+                    },
+                    recycle: {
+                        summary: 'Recycle the damaged screen and any water-sensitive components responsibly.',
+                        guidance: 'Avoid disposal! Take to certified Sampaloc technicians to harvest motherboards and connectors as modular repair parts replacement blocks.'
+                    },
+                    color: '#f59e0b'
+                };
+            }
+        }
+    } else {
+        if (waterDamaged === 'yes') {
+            return {
+                title: '♻️ Zero Recovery Potential / Circular Recycle Needed',
+                resale: {
+                    summary: 'Extensive water damage reduces resale potential. Only metal housing and unused connectors may have salvage value.',
+                    estimate: 'Estimated salvage value: ₱100 - ₱300 for metal/connector parts.'
+                },
+                recycle: {
+                    summary: 'Water-exposed electronics should be recycled to prevent environmental contamination.',
+                    guidance: 'Place directly in National U collection vaults. Certified refining services isolate palladium, nickel, and copper alloy traces to eliminate heavy toxic seepage.'
+                },
+                color: '#10b981'
+            };
+        } else {
+            return {
+                title: '🔌 Diagnostic Evaluation / No-Power Booting State',
+                resale: {
+                    summary: 'The device does not power on but is not water damaged. There may still be value in the board, battery, and casing.',
+                    estimate: 'Estimated salvage value: ₱300 - ₱900 depending on recoverable parts.'
+                },
+                recycle: {
+                    summary: 'Recycle the battery and any damaged electronics using approved e-waste channels.',
+                    guidance: 'Request professional component assessments before declaring as total loss. If unfixable, strip chassis covers to separate cells from standard plastics recycling.'
+                },
+                color: '#3b82f6'
+            };
+        }
+    }
 }

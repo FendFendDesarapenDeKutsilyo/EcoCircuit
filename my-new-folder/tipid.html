@@ -182,13 +182,16 @@
     <script src="./main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Check auth
             if (!enforceAuthentication()) {
                 injectLoginModal();
                 return;
             }
 
+            // Injects navbar
             injectNavbar('tipid');
 
+            // Populate target device mode
             const session = getSession();
             if (session) {
                 const targetLabel = document.getElementById('targetDeviceLabel');
@@ -199,6 +202,7 @@
                 if (dev === 'tablet') deviceText = 'Tablet';
                 targetLabel.textContent = deviceText;
 
+                // Restore previous calculation if exists
                 const savedHistory = getSavedResults();
                 if (savedHistory && savedHistory.tipid) {
                     const saved = savedHistory.tipid;
@@ -206,6 +210,8 @@
                     document.getElementById('newPhonePrice').value = saved.newPrice;
                     document.getElementById('partsAvail').value = saved.partsAvail;
                     document.getElementById('physDamage').value = saved.physDamage;
+                    
+                    // Display calculation results immediately
                     displayTipidResult(saved.result);
                 }
             }
@@ -223,56 +229,51 @@
             }
 
             const session = getSession();
-            const deviceType = session && session.selectedDevice ? session.selectedDevice : 'laptop';
-            const conditions = { partsAvail, physDamage };
+            const username = session ? session.studentName : 'Bulldog';
+            const deviceType = session?.selectedDevice || 'cellphone';
 
-            // Show loading state
-            const badge = document.getElementById('recommendationBadge');
-            badge.innerText = '⏳ Computing backend analysis...';
-            badge.style.backgroundColor = '#ffffff22';
-            badge.style.borderColor = '#ffffff44';
-            badge.style.color = '#ffffff';
+            let result;
 
             try {
-                // Call real backend API — no fallback
-                const apiResult = await callApi('POST', '/api/tipid/evaluate', {
+                // Try backend API first
+                const data = await apiFetch('POST', '/api/tipid/evaluate', {
                     deviceType,
-                    age: 2,
                     newPrice,
                     repairCost,
-                    conditions,
+                    age: 0,
+                    conditions: { partsAvail, physDamage }
                 });
-
                 // Map backend response to frontend format
-                const result = {
-                    rec: apiResult.recommendation || 'Assessment Complete',
-                    reason: apiResult.reason || 'Backend analysis completed.',
-                    color: apiResult.color || '#10b981',
+                result = {
+                    rec: data.recommendation,
+                    reason: data.reason,
+                    color: data.color || '#10b981'
                 };
-
-                saveModuleResult('tipid', {
-                    repairCost,
-                    newPrice,
-                    partsAvail,
-                    physDamage,
-                    result
-                });
-
-                displayTipidResult(result);
-
-                const saveNotif = document.getElementById('saveNotification');
-                saveNotif.classList.remove('hidden');
-                setTimeout(() => saveNotif.classList.add('hidden'), 3000);
-
+                console.log('[TIPID] Backend result:', data);
             } catch (err) {
-                // Show the error to user — no silent fallback
-                displayTipidResult({
-                    rec: '❌ Backend Unavailable',
-                    reason: 'The server could not process the request. Make sure the server is running (npm start). Error: ' + err.message,
-                    color: '#ef4444',
-                });
-                console.error('[EcoCircuit] Tipid API error:', err);
+                // Fallback to local calculation
+                console.warn('[TIPID] Backend unavailable, using local calculation:', err.message);
+                result = evaluateTipidFormula(repairCost, newPrice, partsAvail, physDamage, username);
             }
+
+            // Save results to history
+            saveModuleResult('tipid', {
+                repairCost,
+                newPrice,
+                partsAvail,
+                physDamage,
+                result
+            });
+
+            // Trigger animations
+            displayTipidResult(result);
+
+            // Display persistent success notification
+            const saveNotif = document.getElementById('saveNotification');
+            saveNotif.classList.remove('hidden');
+            setTimeout(() => {
+                saveNotif.classList.add('hidden');
+            }, 3000);
         }
 
         function displayTipidResult(result) {
