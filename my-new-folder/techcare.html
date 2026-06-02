@@ -57,7 +57,7 @@
                 🔧 TECH-CARE HARDWARE DIAGNOSTICS
             </h1>
             <p class="text-blue-100 text-sm max-w-2xl">
-                Evaluating <span id="currentProfileTitle" class="text-[#00bcd4] font-extrabold font-mono">None</span> target profile system health. Proceed past our 3 diagnostic stages to unlock precise physical maintenance protocols.
+                Evaluating <span id="currentProfileTitle" class="text-[#00bcd4] font-extrabold font-mono">None</span> target profile system health. Proceed through the diagnostic stages to unlock precise physical maintenance protocols.
             </p>
         </header>
 
@@ -71,14 +71,14 @@
                         <h2 class="text-white font-bold text-lg flex items-center gap-2">
                             <span class="text-[#00bcd4]">🧠</span> Diagnostic Wizard
                         </h2>
-                        <span id="quizProgressBar" class="text-[10px] font-bold bg-[rgba(255,255,255,0.1)] px-2 py-1 rounded text-white">Stage 1/3</span>
+                        <span id="quizProgressBar" class="text-[10px] font-bold bg-[rgba(255,255,255,0.1)] px-2 py-1 rounded text-white">Initializing...</span>
                     </div>
 
                     <!-- QUIZ ITEM INTERACTIVE WRAPPER -->
                     <div id="quizQuestionPanel" class="animate-fadeIn py-6">
-                        <h3 id="tc-stage-title" class="text-[#00bcd4] text-xs font-black uppercase tracking-widest mb-1.5">Stage 1: Battery health</h3>
+                        <h3 id="tc-stage-title" class="text-[#00bcd4] text-xs font-black uppercase tracking-widest mb-1.5">Loading...</h3>
                         <p id="tc-prompt" class="text-white text-base font-bold leading-snug mb-6">
-                            Does your system suffer random reboot shutdowns or die over 10%?
+                            Contacting backend diagnostic engine...
                         </p>
 
                         <div class="flex gap-4">
@@ -95,7 +95,7 @@
                     <div id="quizCompletePanel" class="hidden animate-fadeIn py-6 text-center">
                         <div class="text-5xl mb-3">📋</div>
                         <h3 class="text-white font-extrabold text-xl mb-1">Evaluation Completed!</h3>
-                        <p class="text-xs text-blue-200 mb-6">Your customized maintenance protocols have been generated successfully.</p>
+                        <p class="text-xs text-blue-200 mb-6">Your customized maintenance protocols have been generated successfully by the backend engine.</p>
                         <button id="btn-tc-reset" onclick="resetDiagnostics()" class="btn-secondary text-xs px-4 py-2 select-none cursor-pointer">
                             Rerun Diagnostic Stages &rarr;
                         </button>
@@ -117,7 +117,7 @@
                     <div id="protocolPlaceholder" class="text-center py-16 text-gray-400">
                         <div class="text-4xl mb-3">⚙️</div>
                         <p class="text-sm font-semibold text-white">Awaiting Diagnostic Input</p>
-                        <p class="text-[11px] text-gray-400 mt-1">Logs populate dynamically as questions are answered.</p>
+                        <p class="text-[11px] text-gray-400 mt-1">Logs populate dynamically as questions are answered via backend.</p>
                     </div>
 
                     <!-- PROTOCOLS LOG STREAM -->
@@ -173,20 +173,18 @@
     <script src="./main.js"></script>
     <script>
         let currentStageIndex = 0;
-        let activeQuestions = [];
+        let chatbotHistory = [];
+        let currentPrompt = null;
         let collectedResponses = [];
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check auth
+        document.addEventListener('DOMContentLoaded', async () => {
             if (!enforceAuthentication()) {
                 injectLoginModal();
                 return;
             }
 
-            // Injects navbar
             injectNavbar('techcare');
 
-            // Load device context
             const session = getSession();
             if (session) {
                 const dev = session.selectedDevice || 'cellphone';
@@ -196,68 +194,167 @@
                 
                 document.getElementById('currentProfileTitle').innerText = label.toUpperCase();
 
-                // Select questions matching device profile
-                activeQuestions = TECHCARE_QUESTIONS[dev] || TECHCARE_QUESTIONS['cellphone'];
-
-                // Restore previous results history if exists
+                // Restore previous results
                 const savedHistory = getSavedResults();
                 if (savedHistory && savedHistory.techcare) {
                     collectedResponses = savedHistory.techcare.responses || [];
-                    currentStageIndex = activeQuestions.length; // Complete state
-                    loadCompleteLayout();
-                } else {
-                    renderQuestionStage();
+                    currentStageIndex = savedHistory.techcare.completed || 0;
+                    if (collectedResponses.length > 0) {
+                        loadCompleteLayout();
+                        return;
+                    }
                 }
+
+                // Start backend chatbot session
+                try {
+                    const startResult = await callApi('POST', '/api/techcare/start', { deviceType: dev });
+                    if (startResult && startResult.firstPrompt) {
+                        currentPrompt = startResult.firstPrompt;
+                        renderBackendQuestion(startResult);
+                        return;
+                    }
+                } catch (err) {
+                    console.warn('[EcoCircuit] TechCare: Backend start failed:', err.message);
+                }
+
+                // If backend failed completely, show error
+                renderBackendError('Could not start diagnostic session. Is the server running?');
             }
         });
 
-        function renderQuestionStage() {
-            if (currentStageIndex >= activeQuestions.length) {
-                loadCompleteLayout();
-                return;
-            }
-
-            const q = activeQuestions[currentStageIndex];
-
+        function renderBackendQuestion(startResult) {
             document.getElementById('quizQuestionPanel').classList.remove('hidden');
             document.getElementById('quizCompletePanel').classList.add('hidden');
-            document.getElementById('quizProgressBar').innerText = `Stage ${currentStageIndex + 1}/${activeQuestions.length}`;
             
-            document.getElementById('tc-stage-title').innerText = q.title;
-            document.getElementById('tc-prompt').innerText = q.prompt;
+            const prompt = currentPrompt || startResult.firstPrompt;
+            document.getElementById('quizProgressBar').innerText = 
+                `State: ${prompt.state || 'ACTIVE'}`;
+
+            const stageLabel = prompt.state === 'DAMAGE_CATEGORY' ? 'Select Damage Type' :
+                               prompt.state === 'SEVERITY_CHECK' ? 'Severity Assessment' :
+                               prompt.state === 'SPECIFIC_ISSUE' ? 'Specific Issue' :
+                               prompt.state === 'OUTCOME' ? 'Analysis Complete' : 'Diagnostic';
+            
+            document.getElementById('tc-stage-title').innerText = prompt.state || 'QUESTION';
+            document.getElementById('tc-prompt').innerText = prompt.message || 'Select an option below.';
         }
 
-        function handleResponseClick(isYes) {
-            const q = activeQuestions[currentStageIndex];
-            const answerText = isYes ? q.yesResponse : q.noResponse;
+        async function handleResponseClick(isYes) {
+            const session = getSession();
+            const dev = (session && session.selectedDevice) || 'cellphone';
+            const userInput = isYes ? 'yes' : 'no';
 
-            collectedResponses.push({
-                stage: q.title,
-                issue: q.issueTag,
-                answer: isYes ? 'Yes' : 'No',
-                protocol: answerText
-            });
+            // Disable buttons during API call
+            document.getElementById('btn-tc-yes').disabled = true;
+            document.getElementById('btn-tc-no').disabled = true;
+            document.getElementById('btn-tc-yes').style.opacity = '0.5';
+            document.getElementById('btn-tc-no').style.opacity = '0.5';
 
-            // Update result diagnostics viewport list
-            document.getElementById('protocolPlaceholder').classList.add('hidden');
-            const logContainer = document.getElementById('protocolsLogContainer');
-            logContainer.classList.remove('hidden');
+            try {
+                // Call backend chatbot message API — no fallback
+                const result = await callApi('POST', '/api/techcare/chatbot/message', {
+                    deviceType: dev,
+                    userInput,
+                    messageHistory: chatbotHistory,
+                });
 
-            const logItem = document.createElement('div');
-            logItem.className = 'p-3 bg-[rgba(255,255,255,0.08)] rounded-xl border border-[rgba(255,255,255,0.08)] animate-fadeIn text-left text-xs text-gray-200';
-            logItem.innerHTML = `
-                <div class="flex items-center justify-between mb-1.5">
-                    <strong class="text-[#00bcd4] font-bold uppercase tracking-wider">${q.title}</strong>
-                    <span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase ${isYes ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${isYes ? 'Fault Detected' : 'Healthy State'}</span>
-                </div>
-                <p class="mb-1 text-gray-200"><strong>Choice:</strong> ${isYes ? 'Yes, currently manifests.' : 'No, working stably.'}</p>
-                <p class="text-gray-300 italic"><strong>Protocol:</strong> ${answerText}</p>
-            `;
-            logContainer.appendChild(logItem);
-            logContainer.scrollTop = logContainer.scrollHeight;
+                chatbotHistory.push({ role: 'user', content: userInput });
+                
+                if (result && result.botMessage) {
+                    chatbotHistory.push({ role: 'assistant', content: result.botMessage, state: result.currentState });
+                }
 
-            currentStageIndex++;
-            renderQuestionStage();
+                // Log the response
+                const stageTitle = (result.nextPrompt && result.nextPrompt.state) || 'Response';
+                const responseText = result.botMessage || 'Processing...';
+                
+                collectedResponses.push({
+                    stage: stageTitle,
+                    issue: 'diagnostic',
+                    answer: isYes ? 'Yes' : 'No',
+                    protocol: responseText,
+                });
+
+                // Update log display
+                document.getElementById('protocolPlaceholder').classList.add('hidden');
+                const logContainer = document.getElementById('protocolsLogContainer');
+                logContainer.classList.remove('hidden');
+
+                const logItem = document.createElement('div');
+                const isFault = isYes;
+                logItem.className = 'p-3 bg-[rgba(255,255,255,0.08)] rounded-xl border border-[rgba(255,255,255,0.08)] animate-fadeIn text-left text-xs text-gray-200';
+                logItem.innerHTML = `
+                    <div class="flex items-center justify-between mb-1.5">
+                        <strong class="text-[#00bcd4] font-bold uppercase tracking-wider">${stageTitle}</strong>
+                        <span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase ${isFault ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${isFault ? 'Fault Detected' : 'Healthy State'}</span>
+                    </div>
+                    <p class="mb-1 text-gray-200"><strong>Choice:</strong> ${isYes ? 'Yes, currently manifests.' : 'No, working stably.'}</p>
+                    <p class="text-gray-300 italic"><strong>Protocol:</strong> ${responseText}</p>
+                `;
+                logContainer.appendChild(logItem);
+                logContainer.scrollTop = logContainer.scrollHeight;
+
+                // Check if conversation is complete
+                if (result.isComplete || (result.nextPrompt && result.nextPrompt.state === 'OUTCOME')) {
+                    // Save results
+                    saveModuleResult('techcare', {
+                        responses: collectedResponses,
+                        completed: collectedResponses.length,
+                    });
+                    document.getElementById('techcareSaveBadge').classList.remove('hidden');
+                    
+                    document.getElementById('quizQuestionPanel').classList.add('hidden');
+                    document.getElementById('quizCompletePanel').classList.remove('hidden');
+                    document.getElementById('quizProgressBar').innerText = `Stage Complete`;
+                } else {
+                    // Update prompt for next question
+                    currentPrompt = result.nextPrompt;
+                    renderBackendQuestion({ firstPrompt: result.nextPrompt });
+                }
+
+            } catch (err) {
+                // No fallback — show error
+                collectedResponses.push({
+                    stage: 'API Error',
+                    issue: 'error',
+                    answer: isYes ? 'Yes' : 'No',
+                    protocol: '❌ Backend error: ' + err.message,
+                });
+
+                document.getElementById('protocolPlaceholder').classList.add('hidden');
+                const logContainer = document.getElementById('protocolsLogContainer');
+                logContainer.classList.remove('hidden');
+
+                const logItem = document.createElement('div');
+                logItem.className = 'p-3 bg-red-900/30 rounded-xl border border-red-800 animate-fadeIn text-left text-xs text-gray-200';
+                logItem.innerHTML = `
+                    <div class="flex items-center justify-between mb-1.5">
+                        <strong class="text-red-400 font-bold uppercase tracking-wider">❌ Backend Error</strong>
+                        <span class="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase bg-red-100 text-red-800">Error</span>
+                    </div>
+                    <p class="text-red-300 italic"><strong>Message:</strong> ${err.message}</p>
+                `;
+                logContainer.appendChild(logItem);
+
+                document.getElementById('quizProgressBar').innerText = `Error`;
+                console.error('[EcoCircuit] TechCare API error:', err);
+            }
+
+            // Re-enable buttons
+            document.getElementById('btn-tc-yes').disabled = false;
+            document.getElementById('btn-tc-no').disabled = false;
+            document.getElementById('btn-tc-yes').style.opacity = '1';
+            document.getElementById('btn-tc-no').style.opacity = '1';
+        }
+
+        function renderBackendError(message) {
+            document.getElementById('quizQuestionPanel').classList.remove('hidden');
+            document.getElementById('quizCompletePanel').classList.add('hidden');
+            document.getElementById('quizProgressBar').innerText = `Error`;
+            document.getElementById('tc-stage-title').innerText = '⚠️ CONNECTION ERROR';
+            document.getElementById('tc-prompt').innerText = message + '\n\nPlease ensure the server is running (npm start) and try again.';
+            document.getElementById('btn-tc-yes').style.display = 'none';
+            document.getElementById('btn-tc-no').style.display = 'none';
         }
 
         function loadCompleteLayout() {
@@ -265,15 +362,14 @@
             document.getElementById('quizCompletePanel').classList.remove('hidden');
             document.getElementById('quizProgressBar').innerText = `Stage Complete`;
 
-            // Display protocols list
             document.getElementById('protocolPlaceholder').classList.add('hidden');
             const logContainer = document.getElementById('protocolsLogContainer');
             logContainer.innerHTML = '';
             logContainer.classList.remove('hidden');
 
             collectedResponses.forEach(res => {
-                const logItem = document.createElement('div');
                 const isYes = res.answer === 'Yes';
+                const logItem = document.createElement('div');
                 logItem.className = 'p-3 bg-[rgba(255,255,255,0.08)] rounded-xl border border-[rgba(255,255,255,0.08)] text-left text-xs text-gray-200';
                 logItem.innerHTML = `
                     <div class="flex items-center justify-between mb-1.5">
@@ -286,19 +382,18 @@
                 logContainer.appendChild(logItem);
             });
 
-            // Save results to history
-            saveModuleResult('techcare', {
-                responses: collectedResponses
-            });
-
-            // Show save persistent indicator
             document.getElementById('techcareSaveBadge').classList.remove('hidden');
         }
 
         function resetDiagnostics() {
             if (confirm('Rerun evaluations? Previous protocols index records will be reset.')) {
                 currentStageIndex = 0;
+                chatbotHistory = [];
                 collectedResponses = [];
+                currentPrompt = null;
+                
+                document.getElementById('btn-tc-yes').style.display = '';
+                document.getElementById('btn-tc-no').style.display = '';
                 
                 const logContainer = document.getElementById('protocolsLogContainer');
                 logContainer.innerHTML = '';
@@ -307,12 +402,12 @@
                 document.getElementById('protocolPlaceholder').classList.remove('hidden');
                 document.getElementById('techcareSaveBadge').classList.add('hidden');
 
-                // Clear history keys
                 const history = getSavedResults();
                 delete history.techcare;
                 localStorage.setItem('ecocircuit_saved_results', JSON.stringify(history));
 
-                renderQuestionStage();
+                // Restart session
+                window.location.reload();
             }
         }
     </script>
