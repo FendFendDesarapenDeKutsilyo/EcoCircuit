@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfer Hub — EcoCircuit Collective</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nuBlue: '#35408e',
+                        nuGold: '#ffd400',
+                        nuDark: '#242b5e'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f3d9e 0%, #1565c0 40%, #2196f3 80%, #42a5f5 100%);
+        }
+        .module-header-badge {
+            display: inline-block;
+            background: rgba(46,204,113,0.15);
+            color: #2ecc71;
+            border: 1px solid rgba(46,204,113,0.25);
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- NAVBAR INJECTION BOUNDARY -->
+    <div id="navbar-container"></div>
+
+    <!-- MAIN MODULE CONTENT -->
+    <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-8">
+        <!-- HEADER -->
+        <header class="mb-8">
+            <span class="module-header-badge">
+                MODULE 03 — DISPOSAL STRATEGY & TRANSFER
+            </span>
+            <h1 class="text-white text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">
+                ♻️ TRANSFER HUB DISPOSAL CALCULATOR
+            </h1>
+            <p class="text-blue-100 text-sm max-w-2xl">
+                Trace structural components, evaluate parts resale viability, or localize dedicated campus e-waste recycling collectors to optimize raw metal circular loops.
+            </p>
+        </header>
+
+        <!-- TWO-COLUMN WORKSPACE -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mb-12">
+            
+            <!-- CHECKLIST INPUT PANEL (NAVY CARD) -->
+            <section class="card p-6">
+                <h2 class="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                    <span class="text-[#2ecc71]">📋</span> Hardware State Registry
+                </h2>
+
+                <div class="mini-tool space-y-4 text-left">
+                    <div>
+                        <label id="transfer-q1" class="block text-xs font-bold text-gray-300 mb-1">
+                            Does the device power on successfully?
+                        </label>
+                        <select id="t-power" onchange="runTransferEvaluation()">
+                            <option value="yes">Yes, completes booting sequences</option>
+                            <option value="no">No, entirely unreactive</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label id="transfer-q2" class="block text-xs font-bold text-gray-300 mb-1">
+                            Is the battery physically swollen or bulging?
+                        </label>
+                        <select id="t-battery" onchange="runTransferEvaluation()">
+                            <option value="no">No, remains flat and stable</option>
+                            <option value="yes">Yes, shows swelling expansion casing</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label id="transfer-q3" class="block text-xs font-bold text-gray-300 mb-1">
+                            Is the internal display / digitizer glass functional?
+                        </label>
+                        <select id="t-screen" onchange="runTransferEvaluation()">
+                            <option value="yes">Yes, pristine pixels intact</option>
+                            <option value="no">No, cracked or displays black bleed lines</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label id="transfer-q4" class="block text-xs font-bold text-gray-300 mb-1">
+                            Has it been exposed to liquid spills or submersion?
+                        </label>
+                        <select id="t-water" onchange="runTransferEvaluation()">
+                            <option value="no">No, dry circuits</option>
+                            <option value="yes">Yes, submerged or corroded components</option>
+                        </select>
+                    </div>
+
+                    <button id="btn-decide-transfer" onclick="runTransferEvaluation()" class="btn-action w-full justify-center select-none cursor-pointer mt-4">
+                        Recompute Disposal Audit &rarr;
+                    </button>
+                </div>
+            </section>
+
+            <!-- RESOLUTION OUTCOMES AREA (NAVY CARD) -->
+            <section class="card p-6 min-h-[380px] flex flex-col justify-between text-left">
+                <div>
+                    <h2 class="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                        <span class="text-[#2ecc71]">⚡</span> Disposal Audit Report
+                    </h2>
+
+                    <div id="transferEmptyState" class="text-center py-12 text-gray-400">
+                        <div class="text-5xl mb-3">🔄</div>
+                        <p class="text-sm font-semibold text-white">Running Audit</p>
+                        <p class="text-xs text-gray-400 mt-1">Configure specs on the left to review component salvage metrics.</p>
+                    </div>
+
+                    <div id="transfer-result" class="hidden space-y-4 animate-fadeIn">
+                        <div id="transferTitleBadge" class="p-3.5 rounded-xl border font-black text-sm text-center">
+                            <!-- JS Inject -->
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3">
+                            <div class="bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.08)] p-3.5 rounded-xl">
+                                <span class="block text-[9px] font-black text-[#ffd400] uppercase tracking-widest mb-1">💸 Re-commerce Harvest Option:</span>
+                                <p id="transferResaleSummary" class="text-xs text-gray-200 leading-relaxed mb-1.5"></p>
+                                <strong id="transferEstimateValue" class="text-white text-xs block font-bold font-mono"></strong>
+                            </div>
+
+                            <div class="bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.08)] p-3.5 rounded-xl">
+                                <span class="block text-[9px] font-black text-[#2ecc71] uppercase tracking-widest mb-1">♻️ Circular Recycling Path:</span>
+                                <p id="transferRecycleSummary" class="text-xs text-gray-200 leading-relaxed mb-1.5"></p>
+                                <p id="transferGuidanceText" class="text-[11px] text-blue-200 italic leading-snug"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="transferSaveBadge" class="hidden text-center text-xs font-semibold text-[#2ecc71] py-2 border-t border-[rgba(255,255,255,0.08)] mt-4">
+                    ⚡ Disposal metrics synced under Local History.
+                </div>
+            </section>
+
+        </div>
+
+        <!-- RECYCLING SAFETY RULES -->
+        <section class="mb-12">
+            <h2 class="text-white font-extrabold text-xl mb-4 uppercase tracking-wide">
+                Environmental Precedence Rules
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-[var(--card-navy)] border border-[rgba(255,255,255,0.08)] rounded-2xl p-5 hover:border-[#2ecc71]/40 transition-colors">
+                    <h3 class="text-[#2ecc71] font-bold text-sm mb-2 uppercase tracking-wide">📦 Component Isolation</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed">
+                        Always isolate and strip lithium-ion batteries from aluminum housings before disposal. Incinerating battery units creates extreme local toxicity risks.
+                    </p>
+                </div>
+                <div class="bg-[var(--card-navy)] border border-[rgba(255,255,255,0.08)] rounded-2xl p-5 hover:border-[#2ecc71]/40 transition-colors">
+                    <h3 class="text-[#2ecc71] font-bold text-sm mb-2 uppercase tracking-wide">🏭 Metal Refining</h3>
+                    <p class="text-xs text-gray-300 leading-relaxed">
+                        Delivering boards to specialized refiners ensures that heavy chemical residuals elements (e.g. lead, mercury) are handled in vacuum-tight smelting rooms.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="max-w-7xl mx-auto text-center px-4">
+            <p class="text-xs mb-1 font-bold tracking-wide uppercase text-gray-500">EcoCircuit Collective &bull; National University Manila Campus</p>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="./main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check auth
+            if (!enforceAuthentication()) {
+                injectLoginModal();
+                return;
+            }
+
+            // Injects navbar
+            injectNavbar('transfer');
+
+            // Restore previous registry values if exists
+            const savedHistory = getSavedResults();
+            if (savedHistory && savedHistory.transfer) {
+                const saved = savedHistory.transfer;
+                document.getElementById('t-power').value = saved.powersOn;
+                document.getElementById('t-battery').value = saved.batterySwollen;
+                document.getElementById('t-screen').value = saved.screenFunctional;
+                document.getElementById('t-water').value = saved.waterDamaged;
+                
+                displayTransferResult(saved.result);
+            } else {
+                // Run immediate calculation for initial state
+                runTransferEvaluation();
+            }
+        });
+
+        async function runTransferEvaluation() {
+            const powersOn = document.getElementById('t-power').value;
+            const batterySwollen = document.getElementById('t-battery').value;
+            const screenFunctional = document.getElementById('t-screen').value;
+            const waterDamaged = document.getElementById('t-water').value;
+
+            const session = getSession();
+            const deviceType = session?.selectedDevice || 'cellphone';
+
+            let result;
+
+            try {
+                // Try backend API first
+                const data = await apiFetch('POST', '/api/transfer/evaluate/anonymous', {
+                    deviceType,
+                    age: 0,
+                    conditions: {
+                        hasPower: powersOn,
+                        batteryHealth: batterySwollen,
+                        screenIntact: screenFunctional,
+                        waterDamage: waterDamaged
+                    }
+                });
+                // Map backend response to frontend display format
+                result = {
+                    title: data.outcome || 'Transfer Evaluation Result',
+                    resale: {
+                        summary: data.resaleSummary || 'Evaluation complete.',
+                        estimate: data.resaleEstimate || ''
+                    },
+                    recycle: {
+                        summary: data.recycleSummary || 'See guidance below.',
+                        guidance: data.recycleGuidance || 'Follow responsible disposal procedures.'
+                    },
+                    color: data.color || '#10b981'
+                };
+                console.log('[TRANSFER] Backend result:', data);
+            } catch (err) {
+                // Fallback to local calculation
+                console.warn('[TRANSFER] Backend unavailable, using local calculation:', err.message);
+                result = evaluateTransferFormula(powersOn, batterySwollen, screenFunctional, waterDamaged);
+            }
+
+            displayTransferResult(result);
+
+            // Persist locally
+            saveModuleResult('transfer', {
+                powersOn,
+                batterySwollen,
+                screenFunctional,
+                waterDamaged,
+                result
+            });
+
+            // Show save indicators
+            const badge = document.getElementById('transferSaveBadge');
+            badge.classList.remove('hidden');
+            setTimeout(() => {
+                badge.classList.add('hidden');
+            }, 3000);
+        }
+
+        function displayTransferResult(result) {
+            document.getElementById('transferEmptyState').classList.add('hidden');
+            const container = document.getElementById('transfer-result');
+            container.classList.remove('hidden');
+
+            const badge = document.getElementById('transferTitleBadge');
+            badge.innerText = result.title;
+            badge.style.backgroundColor = result.color + '22';
+            badge.style.borderColor = result.color + '66';
+            badge.style.color = result.color;
+
+            document.getElementById('transferResaleSummary').innerText = result.resale.summary;
+            document.getElementById('transferEstimateValue').innerText = result.resale.estimate;
+            document.getElementById('transferRecycleSummary').innerText = result.recycle.summary;
+            document.getElementById('transferGuidanceText').innerText = '💡 Guidelines: ' + result.recycle.guidance;
+        }
+    </script>
+</body>
+</html>

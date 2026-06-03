@@ -1,7 +1,7 @@
 'use strict';
 
 /* Dependencies:
-     - ecocircuit_main.js (Module, ModuleFactory, ElectronicDevice, AppError, ModuleType)
+     - EcoCircuit.js (Module, ModuleFactory, ElectronicDevice, AppError, ModuleType)
 */
 
 const {

@@ -814,7 +814,7 @@ class TransferModule extends Module {
       Creates and returns a configured
       TransferModule instance.
       Extends the abstract ModuleFactory
-      base class from ecocircuit_main.js.
+      base class from EcoCircuit.js.
 */
 
 /**
