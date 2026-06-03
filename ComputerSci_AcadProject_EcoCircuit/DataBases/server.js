@@ -35,8 +35,10 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
-// FIXED: public folder is at root level, not inside DataBases/
-app.use(express.static(path.join(__dirname, '..', 'public')));
+// Serve frontend HTML/CSS/JS files
+app.use(express.static(path.join(__dirname, '..', 'FrontEnd src', 'UI_src')));
+// Serve location images (used by locations.html)
+app.use(express.static(path.join(__dirname, '..', 'FrontEnd src', 'TransferMedia')));
 
 // Security headers
 app.use((req, res, next) => {
@@ -45,7 +47,7 @@ app.use((req, res, next) => {
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader(
         'Content-Security-Policy',
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com"
+        "default-src 'self'; script-src 'self' https://cdn.tailwindcss.com https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src https://fonts.gstatic.com; img-src 'self' data:"
     );
     next();
 });
@@ -65,19 +67,23 @@ app.use((req, res, next) => {
 
 // FIXED: HTML files are in root-level /public, not DataBases/public
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'FrontEnd src', 'UI_src', 'index.html'));
 });
 
 app.get('/tipid', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'tipid.html'));
+    res.sendFile(path.join(__dirname, '..', 'FrontEnd src', 'UI_src', 'tipid.html'));
 });
 
 app.get('/techcare', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'techcare.html'));
+    res.sendFile(path.join(__dirname, '..', 'FrontEnd src', 'UI_src', 'techcare.html'));
 });
 
 app.get('/transfer', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'transfer.html'));
+    res.sendFile(path.join(__dirname, '..', 'FrontEnd src', 'UI_src', 'transfer.html'));
+});
+
+app.get('/locations', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'FrontEnd src', 'UI_src', 'locations.html'));
 });
 
 

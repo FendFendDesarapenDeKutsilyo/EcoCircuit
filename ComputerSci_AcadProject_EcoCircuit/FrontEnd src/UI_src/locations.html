@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Directory — EcoCircuit Collective</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nuBlue: '#35408e',
+                        nuGold: '#ffd400',
+                        nuDark: '#242b5e'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f3d9e 0%, #1565c0 40%, #2196f3 80%, #42a5f5 100%);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- NAVBAR INJECTION BOUNDARY -->
+    <div id="navbar-container"></div>
+
+    <!-- MAIN MODULE CONTENT -->
+    <main class="flex-1 max-w-4xl mx-auto w-full px-4 py-8 text-center">
+        <!-- HEADER -->
+        <header class="mb-8 text-center">
+            <span class="inline-block bg-[rgba(255,255,255,0.12)] text-white border border-[rgba(255,255,255,0.2)] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-2">
+                CAMPUS ENVELOPE SEARCH
+            </span>
+            <h1 class="text-white text-3xl sm:text-4xl font-extrabold tracking-tight mb-2">
+                📍 ECO-DIRECTORY MAP SYSTEM
+            </h1>
+            <p class="text-blue-100 text-sm max-w-2xl mx-auto">
+                Explore local certified repairs or locate specific campus electronic recycling vaults. Filter items using properties below and select cards to open detailed walkthrough directions.
+            </p>
+        </header>
+
+        <!-- FILTERS -->
+        <div class="flex justify-center gap-2 mb-10 select-none">
+            <button onclick="setFilter('all')" id="filterBtnAll" class="nav-pill brightness-110">
+                All Locations
+            </button>
+            <button onclick="setFilter('repair')" id="filterBtnRepair" class="nav-pill bg-[rgba(255,212,0,0.2)] text-[#ffd400] border border-[rgba(255,212,0,0.3)] font-bold px-4 py-1.5 rounded-full text-xs">
+                Certified Repairs Only
+            </button>
+            <button onclick="setFilter('waste')" id="filterBtnWaste" class="nav-pill bg-[rgba(46,204,113,0.2)] text-[#2ecc71] border border-[rgba(46,204,113,0.3)] font-bold px-4 py-1.5 rounded-full text-xs">
+                E-Waste Bins Only
+            </button>
+        </div>
+
+        <!-- LOCATIONS DIRECTORY GRID -->
+        <section class="max-w-5xl mx-auto">
+            <div id="locationsDirectoryContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Location Items Injected Dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="max-w-7xl mx-auto text-center px-4">
+            <p class="text-xs mb-1 font-bold tracking-wide uppercase text-gray-500">EcoCircuit Collective &bull; National University Manila Campus</p>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="./main.js"></script>
+    <script>
+        let currentFilter = 'all';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check auth
+            if (!enforceAuthentication()) {
+                injectLoginModal();
+                return;
+            }
+
+            // Injects navbar
+            injectNavbar('locations');
+
+            // Render default list
+            renderDirectory();
+        });
+
+        function setFilter(type) {
+            currentFilter = type;
+
+            const btnAll = document.getElementById('filterBtnAll');
+            const btnRepair = document.getElementById('filterBtnRepair');
+            const btnWaste = document.getElementById('filterBtnWaste');
+
+            btnAll.className = "font-bold px-4 py-1.5 rounded-full text-xs border border-white/20 text-gray-300 bg-transparent";
+            btnRepair.className = "font-bold px-4 py-1.5 rounded-full text-xs border border-amber-500/20 text-amber-400 bg-transparent";
+            btnWaste.className = "font-bold px-4 py-1.5 rounded-full text-xs border border-emerald-500/20 text-emerald-400 bg-transparent";
+
+            if (type === 'all') {
+                btnAll.className = "font-bold px-4 py-1.5 rounded-full text-xs border border-white/40 text-white bg-white/20 shadow";
+            } else if (type === 'repair') {
+                btnRepair.className = "font-bold px-4 py-1.5 rounded-full text-xs border border-[#ffd400]/40 text-[#ffd400] bg-[rgba(255,212,0,0.2)] shadow";
+            } else if (type === 'waste') {
+                btnWaste.className = "font-bold px-4 py-1.5 rounded-full text-xs border border-[#2ecc71]/40 text-[#2ecc71] bg-[rgba(46,204,113,0.2)] shadow";
+            }
+
+            renderDirectory();
+        }
+
+        function renderDirectory() {
+            const container = document.getElementById('locationsDirectoryContainer');
+            container.innerHTML = '';
+
+            const keys = Object.keys(LOCATION_DATA);
+            let matchCount = 0;
+
+            keys.forEach(key => {
+                const loc = LOCATION_DATA[key];
+                
+                if (currentFilter !== 'all' && loc.type !== currentFilter) {
+                    return;
+                }
+
+                matchCount++;
+                const isRepair = loc.type === 'repair';
+                const tagLabel = isRepair ? 'Repair Hub' : 'Electronic Waste Bin';
+                const emoji = isRepair ? '🔧' : '♻️';
+                const typeClass = isRepair ? 'repair-box' : 'waste-box';
+
+                const cardBox = document.createElement('div');
+                cardBox.className = `loc-box ${typeClass} transition-all animate-fadeIn cursor-pointer`;
+                cardBox.setAttribute('onclick', `showLocationModal('${key}')`);
+                cardBox.innerHTML = `
+                    <div class="text-3xl mb-2">${emoji}</div>
+                    <h4 class="font-bold text-base mb-1 text-white">${loc.title}</h4>
+                    <span class="loc-tag">${tagLabel}</span>
+                `;
+                container.appendChild(cardBox);
+            });
+
+            if (matchCount === 0) {
+                container.innerHTML = `<p class="col-span-full py-16 text-gray-400 text-sm">No matched locations in current directory scope.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
